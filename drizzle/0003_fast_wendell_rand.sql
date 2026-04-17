@@ -1,2 +1,0 @@
-ALTER TABLE `credit_card_transactions` ADD `transactionType` enum('credit','debit') DEFAULT 'credit' NOT NULL;--> statement-breakpoint
-ALTER TABLE `credit_card_transactions` ADD `isPaid` boolean DEFAULT false NOT NULL;
