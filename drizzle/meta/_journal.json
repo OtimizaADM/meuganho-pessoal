@@ -1,0 +1,41 @@
+{
+  "version": "7",
+  "dialect": "mysql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1773539302902,
+      "tag": "0000_classy_spiral",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1773539434853,
+      "tag": "0001_marvelous_crystal",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1773542139150,
+      "tag": "0002_smiling_mephisto",
+      "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1773546432715,
+      "tag": "0003_fast_wendell_rand",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1776431659566,
+      "tag": "0004_broad_proudstar",
+      "breakpoints": true
+    }
+  ]
+}
