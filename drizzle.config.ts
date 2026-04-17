@@ -11,15 +11,8 @@ const url = new URL(must(process.env.DATABASE_URL, "DATABASE_URL"));
 export default defineConfig({
   schema: "./drizzle/schema.ts",
   out: "./drizzle",
-  dialect: "mysql",
+  dialect: "postgresql",
   dbCredentials: {
-    host: url.hostname,
-    port: Number(url.port || "3306"),
-    user: decodeURIComponent(url.username),
-    password: decodeURIComponent(url.password),
-    database: url.pathname.replace("/", ""),
-    ssl: {
-      rejectUnauthorized: true,
-    },
+    url: process.env.DATABASE_URL!,
   },
 });
