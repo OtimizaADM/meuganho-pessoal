@@ -1,6 +1,6 @@
 import { and, asc, desc, eq, gte, lte, sql, SQL } from "drizzle-orm";
-import { MySqlColumn } from "drizzle-orm/mysql-core";
-import { drizzle } from "drizzle-orm/mysql2";
+import { PgColumn } from "drizzle-orm/pg-core";
+import { drizzle } from "drizzle-orm/node-postgres";
 import {
   InsertUser,
   users,
