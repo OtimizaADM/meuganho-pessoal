@@ -1,376 +1,75 @@
-import { useState, useMemo } from "react";
-import { trpc } from "@/lib/trpc";
-import { MonthPicker } from "@/components/MonthPicker";
-import { formatCurrency, formatDate, getCurrentMonth } from "@/lib/format";
+import { ArrowUpRight, Plus, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Badge } from "@/components/ui/badge";
-import { toast } from "sonner";
-import {
-  Plus,
-  Pencil,
-  Trash2,
-  TrendingUp,
-  RefreshCw,
-  Tag,
-} from "lucide-react";
-
-const DEFAULT_CATEGORIES = [
-  { id: -1, name: "Salário", color: "#10b981" },
-  { id: -2, name: "Freelance", color: "#6366f1" },
-  { id: -3, name: "Investimentos", color: "#f59e0b" },
-  { id: -4, name: "Outros", color: "#8b5cf6" },
-];
-
-type IncomeForm = {
-  description: string;
-  amount: string;
-  date: string;
-  categoryId: string;
-  isRecurring: boolean;
-  notes: string;
-};
-
-const emptyForm: IncomeForm = {
-  description: "",
-  amount: "",
-  date: new Date().toISOString().split("T")[0],
-  categoryId: "",
-  isRecurring: false,
-  notes: "",
-};
+import { formatBRL, incomes } from "@/lib/finance-data";
 
 export default function Receitas() {
-  const [month, setMonth] = useState(getCurrentMonth);
-  const [open, setOpen] = useState(false);
-  const [editId, setEditId] = useState<number | null>(null);
-  const [form, setForm] = useState<IncomeForm>(emptyForm);
-  const [deleteId, setDeleteId] = useState<number | null>(null);
-
-  const utils = trpc.useUtils();
-  const { data: incomes = [], isLoading } = trpc.incomes.list.useQuery({ month });
-  const { data: categories = [] } = trpc.incomeCategories.list.useQuery();
-
-  const allCategories = useMemo(() => {
-    const custom = categories.map((c) => ({ id: c.id, name: c.name, color: c.color }));
-    return [...DEFAULT_CATEGORIES, ...custom];
-  }, [categories]);
-
-  const createMutation = trpc.incomes.create.useMutation({
-    onSuccess: () => {
-      utils.incomes.list.invalidate();
-      utils.dashboard.summary.invalidate();
-      toast.success("Receita adicionada!");
-      setOpen(false);
-      setForm(emptyForm);
-    },
-    onError: (e) => toast.error(e.message),
-  });
-
-  const updateMutation = trpc.incomes.update.useMutation({
-    onSuccess: () => {
-      utils.incomes.list.invalidate();
-      utils.dashboard.summary.invalidate();
-      toast.success("Receita atualizada!");
-      setOpen(false);
-      setEditId(null);
-      setForm(emptyForm);
-    },
-    onError: (e) => toast.error(e.message),
-  });
-
-  const deleteMutation = trpc.incomes.delete.useMutation({
-    onSuccess: () => {
-      utils.incomes.list.invalidate();
-      utils.dashboard.summary.invalidate();
-      toast.success("Receita removida.");
-      setDeleteId(null);
-    },
-    onError: (e) => toast.error(e.message),
-  });
-
-  const totalMonth = useMemo(
-    () => incomes.reduce((sum, i) => sum + parseFloat(String(i.amount)), 0),
-    [incomes]
-  );
-
-  function openCreate() {
-    setEditId(null);
-    setForm(emptyForm);
-    setOpen(true);
-  }
-
-  function openEdit(income: (typeof incomes)[0]) {
-    setEditId(income.id);
-    setForm({
-      description: income.description,
-      amount: String(income.amount),
-      date: String(income.date).split("T")[0],
-      categoryId: income.categoryId ? String(income.categoryId) : "",
-      isRecurring: income.isRecurring,
-      notes: income.notes ?? "",
-    });
-    setOpen(true);
-  }
-
-  function handleSubmit() {
-    if (!form.description || !form.amount || !form.date) {
-      toast.error("Preencha todos os campos obrigatórios.");
-      return;
-    }
-    const payload = {
-      description: form.description,
-      amount: form.amount,
-      date: form.date,
-      categoryId: form.categoryId ? parseInt(form.categoryId) : null,
-      isRecurring: form.isRecurring,
-      notes: form.notes || null,
-    };
-    if (editId) {
-      updateMutation.mutate({ id: editId, ...payload });
-    } else {
-      createMutation.mutate(payload);
-    }
-  }
-
-  function getCategoryInfo(categoryId: number | null) {
-    if (!categoryId) return null;
-    return allCategories.find((c) => c.id === categoryId) ?? null;
-  }
+  const total = incomes.reduce((s, i) => s + i.amount, 0);
+  const byCat = incomes.reduce<Record<string, number>>((acc, i) => {
+    acc[i.category] = (acc[i.category] ?? 0) + i.amount;
+    return acc;
+  }, {});
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+    <div className="space-y-8">
+      <header className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold text-foreground">Receitas</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">Gerencie suas entradas financeiras</p>
+          <h2 className="font-display text-2xl lg:text-3xl font-semibold tracking-tight">Receitas</h2>
+          <p className="text-[13px] text-muted-foreground mt-1">Tudo que entrou em abril de 2025</p>
         </div>
-        <div className="flex items-center gap-3">
-          <MonthPicker value={month} onChange={setMonth} />
-          <Button onClick={openCreate} size="sm" className="gap-2">
-            <Plus className="w-4 h-4" />
-            Nova Receita
-          </Button>
-        </div>
-      </div>
+        <Button className="rounded-full h-10 px-5 text-[13px] font-medium shadow-sm">
+          <Plus className="h-4 w-4 mr-1.5" strokeWidth={2} /> Nova receita
+        </Button>
+      </header>
 
-      {/* Summary Card */}
-      <div className="bg-white rounded-2xl border border-border p-6 flex items-center gap-4 shadow-sm">
-        <div className="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center">
-          <TrendingUp className="w-6 h-6 text-emerald-600" />
+      <section className="grid sm:grid-cols-3 gap-4">
+        <div className="rounded-2xl bg-gradient-card text-white p-6 shadow-elegant">
+          <p className="text-[11px] uppercase tracking-wider text-white/70 font-medium">Total no mês</p>
+          <p className="font-display text-[32px] font-bold mt-2 tracking-tight tabular text-white">{formatBRL(total)}</p>
+          <p className="text-[12px] text-white/70 mt-2 inline-flex items-center gap-1">
+            <ArrowUpRight className="h-3 w-3" strokeWidth={2} /> +12.3% vs março
+          </p>
         </div>
-        <div>
-          <p className="text-sm text-muted-foreground">Total de Receitas no Mês</p>
-          <p className="text-2xl font-bold text-emerald-600">{formatCurrency(totalMonth)}</p>
-        </div>
-        <div className="ml-auto text-right">
-          <p className="text-sm text-muted-foreground">Lançamentos</p>
-          <p className="text-xl font-semibold text-foreground">{incomes.length}</p>
-        </div>
-      </div>
-
-      {/* Table */}
-      <div className="bg-white rounded-2xl border border-border shadow-sm overflow-hidden">
-        {isLoading ? (
-          <div className="flex items-center justify-center h-48 text-muted-foreground">Carregando...</div>
-        ) : incomes.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-48 gap-3 text-muted-foreground">
-            <TrendingUp className="w-10 h-10 opacity-30" />
-            <p className="text-sm">Nenhuma receita registrada neste mês.</p>
-            <Button variant="outline" size="sm" onClick={openCreate} className="gap-2">
-              <Plus className="w-4 h-4" /> Adicionar receita
-            </Button>
-          </div>
-        ) : (
-          <table className="w-full">
-            <thead>
-              <tr className="border-b border-border bg-muted/30">
-                <th className="text-left text-xs font-semibold text-muted-foreground px-6 py-3 uppercase tracking-wider">Descrição</th>
-                <th className="text-left text-xs font-semibold text-muted-foreground px-4 py-3 uppercase tracking-wider hidden sm:table-cell">Categoria</th>
-                <th className="text-left text-xs font-semibold text-muted-foreground px-4 py-3 uppercase tracking-wider hidden md:table-cell">Data</th>
-                <th className="text-right text-xs font-semibold text-muted-foreground px-6 py-3 uppercase tracking-wider">Valor</th>
-                <th className="px-4 py-3 w-20"></th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-border">
-              {incomes.map((income) => {
-                const cat = getCategoryInfo(income.categoryId);
-                return (
-                  <tr key={income.id} className="hover:bg-muted/20 transition-colors group">
-                    <td className="px-6 py-4">
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium text-sm text-foreground">{income.description}</span>
-                        {income.isRecurring && (
-                          <RefreshCw className="w-3.5 h-3.5 text-muted-foreground" />
-                        )}
-                      </div>
-                    </td>
-                    <td className="px-4 py-4 hidden sm:table-cell">
-                      {cat ? (
-                        <Badge
-                          variant="secondary"
-                          className="text-xs gap-1"
-                          style={{ backgroundColor: cat.color + "20", color: cat.color, borderColor: cat.color + "40" }}
-                        >
-                          <Tag className="w-2.5 h-2.5" />
-                          {cat.name}
-                        </Badge>
-                      ) : (
-                        <span className="text-xs text-muted-foreground">—</span>
-                      )}
-                    </td>
-                    <td className="px-4 py-4 text-sm text-muted-foreground hidden md:table-cell">
-                      {formatDate(String(income.date))}
-                    </td>
-                    <td className="px-6 py-4 text-right">
-                      <span className="font-semibold text-emerald-600">{formatCurrency(String(income.amount))}</span>
-                    </td>
-                    <td className="px-4 py-4">
-                      <div className="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                        <Button variant="ghost" size="icon" className="h-7 w-7 rounded-lg" onClick={() => openEdit(income)}>
-                          <Pencil className="w-3.5 h-3.5" />
-                        </Button>
-                        <Button
-                          variant="ghost"
-                          size="icon"
-                          className="h-7 w-7 rounded-lg text-destructive hover:text-destructive"
-                          onClick={() => setDeleteId(income.id)}
-                        >
-                          <Trash2 className="w-3.5 h-3.5" />
-                        </Button>
-                      </div>
-                    </td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        )}
-      </div>
-
-      {/* Create/Edit Dialog */}
-      <Dialog open={open} onOpenChange={setOpen}>
-        <DialogContent className="sm:max-w-md">
-          <DialogHeader>
-            <DialogTitle>{editId ? "Editar Receita" : "Nova Receita"}</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 py-2">
-            <div className="space-y-1.5">
-              <Label>Descrição *</Label>
-              <Input
-                placeholder="Ex: Salário, Freelance..."
-                value={form.description}
-                onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
-              />
-            </div>
-            <div className="grid grid-cols-2 gap-3">
-              <div className="space-y-1.5">
-                <Label>Valor (R$) *</Label>
-                <Input
-                  type="number"
-                  step="0.01"
-                  min="0"
-                  placeholder="0,00"
-                  value={form.amount}
-                  onChange={(e) => setForm((f) => ({ ...f, amount: e.target.value }))}
-                />
-              </div>
-              <div className="space-y-1.5">
-                <Label>Data *</Label>
-                <Input
-                  type="date"
-                  value={form.date}
-                  onChange={(e) => setForm((f) => ({ ...f, date: e.target.value }))}
-                />
-              </div>
-            </div>
-            <div className="space-y-1.5">
-              <Label>Categoria</Label>
-              <Select
-                value={form.categoryId || "none"}
-                onValueChange={(v) => setForm((f) => ({ ...f, categoryId: v === "none" ? "" : v }))}
-              >
-                <SelectTrigger>
-                  <SelectValue placeholder="Selecione uma categoria" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="none">Sem categoria</SelectItem>
-                  {allCategories.map((c) => (
-                    <SelectItem key={c.id} value={String(c.id)}>
-                      {c.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-            <div className="space-y-1.5">
-              <Label>Observações</Label>
-              <Input
-                placeholder="Opcional..."
-                value={form.notes}
-                onChange={(e) => setForm((f) => ({ ...f, notes: e.target.value }))}
-              />
-            </div>
-            <div className="flex items-center gap-2">
-              <input
-                type="checkbox"
-                id="recurring"
-                checked={form.isRecurring}
-                onChange={(e) => setForm((f) => ({ ...f, isRecurring: e.target.checked }))}
-                className="rounded"
-              />
-              <Label htmlFor="recurring" className="cursor-pointer font-normal">
-                Receita recorrente (mensal)
-              </Label>
+        {Object.entries(byCat).slice(0, 2).map(([cat, val]) => (
+          <div key={cat} className="card-premium p-6">
+            <p className="text-[11px] uppercase text-muted-foreground tracking-wider font-medium">{cat}</p>
+            <p className="font-display text-[28px] font-semibold mt-2 tabular tracking-tight">{formatBRL(val)}</p>
+            <div className="h-1 bg-muted rounded-full overflow-hidden mt-3">
+              <div className="h-full bg-income transition-all duration-500" style={{ width: `${(val / total) * 100}%` }} />
             </div>
           </div>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setOpen(false)}>Cancelar</Button>
-            <Button
-              onClick={handleSubmit}
-              disabled={createMutation.isPending || updateMutation.isPending}
-            >
-              {editId ? "Salvar" : "Adicionar"}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+        ))}
+      </section>
 
-      {/* Delete Confirm Dialog */}
-      <Dialog open={deleteId !== null} onOpenChange={() => setDeleteId(null)}>
-        <DialogContent className="sm:max-w-sm">
-          <DialogHeader>
-            <DialogTitle>Remover Receita</DialogTitle>
-          </DialogHeader>
-          <p className="text-sm text-muted-foreground">Tem certeza que deseja remover esta receita? Esta ação não pode ser desfeita.</p>
-          <DialogFooter>
-            <Button variant="outline" onClick={() => setDeleteId(null)}>Cancelar</Button>
-            <Button
-              variant="destructive"
-              onClick={() => deleteId && deleteMutation.mutate({ id: deleteId })}
-              disabled={deleteMutation.isPending}
-            >
-              Remover
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <div className="card-premium overflow-hidden">
+        <div className="p-4 border-b border-border flex items-center gap-3">
+          <div className="flex-1 flex items-center gap-2 px-3.5 h-10 rounded-full bg-muted">
+            <Search className="h-4 w-4 text-muted-foreground" strokeWidth={1.75} />
+            <input placeholder="Buscar por descrição..." className="flex-1 bg-transparent outline-none text-[13px]" />
+          </div>
+          <select className="h-10 px-4 rounded-full bg-muted text-[13px] outline-none border-none">
+            <option>Todas categorias</option>
+            <option>Salário</option>
+            <option>Freelance</option>
+            <option>Investimentos</option>
+          </select>
+        </div>
+        <ul className="divide-y divide-border/70">
+          {incomes.map((i) => (
+            <li key={i.id} className="flex items-center gap-4 px-5 py-4 hover:bg-muted/40 transition-colors group">
+              <div className="w-10 h-10 rounded-full bg-income/10 text-income grid place-items-center transition-transform group-hover:scale-105">
+                <ArrowUpRight className="h-4 w-4" strokeWidth={2} />
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="font-medium truncate text-[14px]">{i.description}</p>
+                <p className="text-[12px] text-muted-foreground mt-0.5">
+                  {i.category} · {new Date(i.date).toLocaleDateString("pt-BR")}
+                </p>
+              </div>
+              <span className="font-display font-semibold text-income tabular text-[14px]">+ {formatBRL(i.amount)}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 }
