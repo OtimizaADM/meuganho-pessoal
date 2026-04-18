@@ -25,8 +25,11 @@ import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
 import {
   LayoutDashboard,
+  LineChart,
   LogOut,
   PanelLeft,
+  ShieldCheck,
+  Sparkles,
   TrendingUp,
   TrendingDown,
   CreditCard,
@@ -36,10 +39,32 @@ import {
   RefreshCw,
   Target,
 } from "lucide-react";
-import { CSSProperties, useEffect, useRef, useState } from "react";
+import React, { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from "./DashboardLayoutSkeleton";
 import { Button } from "./ui/button";
+
+function AuthFeature({
+  icon: Icon,
+  title,
+  children,
+}: {
+  icon: React.ElementType;
+  title: string;
+  children: React.ReactNode;
+}) {
+  return (
+    <li className="flex items-start gap-3">
+      <div className="w-9 h-9 rounded-lg bg-white/[0.06] border border-white/10 grid place-items-center shrink-0 mt-0.5">
+        <Icon className="w-[17px] h-[17px] text-white/80" strokeWidth={1.75} />
+      </div>
+      <div>
+        <p className="font-medium text-[14px] text-white">{title}</p>
+        <p className="text-[13px] text-white/50 leading-relaxed mt-0.5">{children}</p>
+      </div>
+    </li>
+  );
+}
 
 const menuItems = [
   {
@@ -92,27 +117,118 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   if (!user) {
     return (
-      <div className="flex items-center justify-center min-h-screen bg-background">
-        <div className="flex flex-col items-center gap-8 p-8 max-w-md w-full">
-          <div className="flex flex-col items-center gap-4">
-            <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center">
-              <Wallet className="w-8 h-8 text-primary" />
+      <div className="min-h-screen w-full bg-background lg:grid lg:grid-cols-[1.05fr,1fr]">
+        {/* Brand side — dark navy */}
+        <aside
+          className="relative overflow-hidden text-white px-6 py-10 lg:px-14 lg:py-14 lg:flex lg:flex-col lg:justify-between min-h-[260px] lg:min-h-screen"
+          style={{ background: "var(--sidebar)" }}
+        >
+          {/* Subtle grid pattern */}
+          <div
+            aria-hidden
+            className="absolute inset-0 opacity-[0.12]"
+            style={{
+              backgroundImage:
+                "linear-gradient(oklch(0.60 0.22 265 / 0.5) 1px, transparent 1px), linear-gradient(90deg, oklch(0.60 0.22 265 / 0.5) 1px, transparent 1px)",
+              backgroundSize: "56px 56px",
+              maskImage: "radial-gradient(ellipse 70% 60% at 30% 40%, #000 30%, transparent 75%)",
+              WebkitMaskImage: "radial-gradient(ellipse 70% 60% at 30% 40%, #000 30%, transparent 75%)",
+            }}
+          />
+          {/* Top glow */}
+          <div
+            aria-hidden
+            className="absolute -top-24 -right-20 w-[420px] h-[420px] rounded-full blur-3xl opacity-40"
+            style={{ background: "radial-gradient(circle, oklch(0.55 0.28 280), transparent 60%)" }}
+          />
+          {/* Bottom glow */}
+          <div
+            aria-hidden
+            className="absolute -bottom-32 -left-20 w-[380px] h-[380px] rounded-full blur-3xl opacity-25"
+            style={{ background: "radial-gradient(circle, oklch(0.50 0.25 295), transparent 60%)" }}
+          />
+
+          {/* Logo */}
+          <div className="relative flex items-center gap-2.5">
+            <div
+              className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
+              style={{ background: "var(--sidebar-primary)" }}
+            >
+              <Wallet className="w-5 h-5 text-white" />
             </div>
-            <div className="text-center">
-              <h1 className="text-2xl font-semibold tracking-tight">Meu Ganho Pessoal</h1>
-              <p className="text-sm text-muted-foreground mt-2 max-w-sm">
-                Gerencie suas finanças pessoais com clareza e inteligência. Faça login para acessar sua conta.
-              </p>
+            <span className="font-semibold text-[16px] tracking-tight text-white">
+              Meu Ganho <span className="text-white/50">Pessoal</span>
+            </span>
+          </div>
+
+          {/* Desktop headline + features */}
+          <div className="relative hidden lg:block max-w-md mt-16">
+            <h1 className="text-[44px] xl:text-[50px] leading-[1.05] font-semibold tracking-tighter text-white">
+              Suas finanças.
+              <br />
+              <span className="text-white/50">Sob controle.</span>
+            </h1>
+            <p className="mt-5 text-[15px] text-white/60 leading-relaxed max-w-sm">
+              Acompanhe receitas, despesas, cartões e metas em um único lugar — com a clareza de um banco premium.
+            </p>
+            <ul className="mt-10 space-y-4">
+              <AuthFeature icon={LineChart} title="Visão clara">
+                Gráficos minimais que mostram exatamente para onde vai o seu dinheiro.
+              </AuthFeature>
+              <AuthFeature icon={ShieldCheck} title="Privado por padrão">
+                Seus dados são seus. Criptografia ponta-a-ponta, sempre.
+              </AuthFeature>
+              <AuthFeature icon={Sparkles} title="Insights inteligentes">
+                Descubra padrões e oportunidades de economia automaticamente.
+              </AuthFeature>
+            </ul>
+          </div>
+
+          {/* Mobile headline */}
+          <div className="relative lg:hidden mt-8">
+            <h1 className="text-3xl font-semibold tracking-tight leading-tight text-white">
+              Suas finanças.
+              <br />
+              <span className="text-white/50">Sob controle.</span>
+            </h1>
+          </div>
+
+          {/* Brand footer */}
+          <div className="relative hidden lg:block">
+            <p className="text-[12px] text-white/35">© 2025 Meu Ganho Pessoal · Feito com cuidado</p>
+          </div>
+        </aside>
+
+        {/* Form side — light */}
+        <main className="relative flex flex-col px-6 py-10 lg:px-16 lg:py-14 bg-background">
+          <div className="flex-1 flex items-center justify-center py-10 lg:py-0">
+            <div className="w-full max-w-[380px] flex flex-col items-center gap-8">
+              <div className="flex flex-col items-center gap-4 text-center">
+                <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center">
+                  <Wallet className="w-7 h-7 text-primary" />
+                </div>
+                <div>
+                  <h2 className="text-2xl font-semibold tracking-tight">Bem-vindo de volta</h2>
+                  <p className="text-sm text-muted-foreground mt-2 max-w-xs">
+                    Faça login para acessar seu painel financeiro pessoal.
+                  </p>
+                </div>
+              </div>
+              <Button
+                onClick={() => { window.location.href = getLoginUrl(); }}
+                size="lg"
+                className="w-full h-12 text-base font-medium"
+              >
+                Entrar na plataforma
+              </Button>
             </div>
           </div>
-          <Button
-            onClick={() => { window.location.href = getLoginUrl(); }}
-            size="lg"
-            className="w-full"
-          >
-            Entrar na plataforma
-          </Button>
-        </div>
+          <p className="text-[11px] text-muted-foreground text-center lg:text-left">
+            Ao continuar, você concorda com os{" "}
+            <span className="underline-offset-2 hover:underline cursor-pointer">Termos</span> e a{" "}
+            <span className="underline-offset-2 hover:underline cursor-pointer">Política de Privacidade</span>.
+          </p>
+        </main>
       </div>
     );
   }
