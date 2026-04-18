@@ -66,7 +66,7 @@ export async function upsertUser(user: InsertUser): Promise<void> {
   if (!values.lastSignedIn) values.lastSignedIn = new Date();
   if (Object.keys(updateSet).length === 0) updateSet.lastSignedIn = new Date();
 
-  await db.insert(users).values(values).onDuplicateKeyUpdate({ set: updateSet });
+  await db.insert(users).values(values).onConflictDoUpdate({ target: users.openId, set: updateSet });
 }
 
 export async function getUserByOpenId(openId: string) {
@@ -256,8 +256,8 @@ export async function createInstallmentPurchase(data: InsertInstallmentPurchase)
   const db = await getDb();
   if (!db) throw new Error("DB unavailable");
   // Insert the purchase
-  const result = await db.insert(installmentPurchases).values(data);
-  const insertId = (result as any)[0]?.insertId as number;
+  const [inserted] = await db.insert(installmentPurchases).values(data).returning({ id: installmentPurchases.id });
+  const insertId = inserted?.id;
 
   // Generate credit card transactions for each installment
   if (data.creditCardId && insertId) {
@@ -605,8 +605,8 @@ export async function getAnnualGoals(userId: number, year: number) {
 export async function createGoal(data: InsertGoal) {
   const db = await getDb();
   if (!db) throw new Error("DB unavailable");
-  const result = await db.insert(goals).values(data);
-  return (result as any)[0]?.insertId as number;
+  const [inserted] = await db.insert(goals).values(data).returning({ id: goals.id });
+  return inserted?.id;
 }
 
 export async function updateGoal(userId: number, id: number, data: Partial<InsertGoal>) {
