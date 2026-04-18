@@ -154,16 +154,16 @@ export default function Receitas() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold text-foreground">Receitas</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">Gerencie suas entradas financeiras</p>
+          <h1 className="text-xl font-semibold tracking-tight text-foreground">Receitas</h1>
+          <p className="text-xs text-muted-foreground mt-0.5">Gerencie suas entradas financeiras</p>
         </div>
         <div className="flex items-center gap-3">
           <MonthPicker value={month} onChange={setMonth} />
-          <Button onClick={openCreate} size="sm" className="gap-2">
+          <Button onClick={openCreate} size="sm" className="gap-2 rounded-full">
             <Plus className="w-4 h-4" />
             Nova Receita
           </Button>
@@ -171,36 +171,36 @@ export default function Receitas() {
       </div>
 
       {/* Summary Card */}
-      <div className="bg-white rounded-2xl border border-border p-6 flex items-center gap-4 shadow-sm">
-        <div className="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center">
-          <TrendingUp className="w-6 h-6 text-emerald-600" />
+      <div className="card-premium p-5 flex items-center gap-4">
+        <div className="w-11 h-11 rounded-xl bg-emerald-50 flex items-center justify-center flex-shrink-0">
+          <TrendingUp className="w-5 h-5 text-emerald-600" />
         </div>
         <div>
-          <p className="text-sm text-muted-foreground">Total de Receitas no Mês</p>
-          <p className="text-2xl font-bold text-emerald-600">{formatCurrency(totalMonth)}</p>
+          <p className="text-xs text-muted-foreground font-medium">Total de Receitas no Mês</p>
+          <p className="text-2xl font-bold text-emerald-600 tabular-nums">{formatCurrency(totalMonth)}</p>
         </div>
         <div className="ml-auto text-right">
-          <p className="text-sm text-muted-foreground">Lançamentos</p>
+          <p className="text-xs text-muted-foreground font-medium">Lançamentos</p>
           <p className="text-xl font-semibold text-foreground">{incomes.length}</p>
         </div>
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-2xl border border-border shadow-sm overflow-hidden">
+      <div className="card-premium overflow-hidden">
         {isLoading ? (
-          <div className="flex items-center justify-center h-48 text-muted-foreground">Carregando...</div>
+          <div className="flex items-center justify-center h-40 text-muted-foreground text-sm">Carregando...</div>
         ) : incomes.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-48 gap-3 text-muted-foreground">
-            <TrendingUp className="w-10 h-10 opacity-30" />
+          <div className="flex flex-col items-center justify-center h-40 gap-3 text-muted-foreground">
+            <TrendingUp className="w-9 h-9 opacity-25" />
             <p className="text-sm">Nenhuma receita registrada neste mês.</p>
-            <Button variant="outline" size="sm" onClick={openCreate} className="gap-2">
+            <Button variant="outline" size="sm" onClick={openCreate} className="gap-2 rounded-full">
               <Plus className="w-4 h-4" /> Adicionar receita
             </Button>
           </div>
         ) : (
           <table className="w-full">
             <thead>
-              <tr className="border-b border-border bg-muted/30">
+              <tr className="border-b border-border bg-muted/20">
                 <th className="text-left text-xs font-semibold text-muted-foreground px-6 py-3 uppercase tracking-wider">Descrição</th>
                 <th className="text-left text-xs font-semibold text-muted-foreground px-4 py-3 uppercase tracking-wider hidden sm:table-cell">Categoria</th>
                 <th className="text-left text-xs font-semibold text-muted-foreground px-4 py-3 uppercase tracking-wider hidden md:table-cell">Data</th>

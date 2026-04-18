@@ -320,16 +320,16 @@ export default function Metas() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold text-foreground">Metas Financeiras</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">Controle de limites mensais e objetivos anuais</p>
+          <h1 className="text-xl font-semibold tracking-tight text-foreground">Metas Financeiras</h1>
+          <p className="text-xs text-muted-foreground mt-0.5">Controle de limites mensais e objetivos anuais</p>
         </div>
         <Button
           onClick={() => tab === "monthly" ? openCreateMonthly() : openCreateAnnual()}
-          className="gap-2 bg-indigo-600 hover:bg-indigo-700 text-white"
+          className="gap-2 rounded-full"
         >
           <Plus className="w-4 h-4" />
           Nova Meta {tab === "monthly" ? "Mensal" : "Anual"}
@@ -338,9 +338,9 @@ export default function Metas() {
 
       {/* Tabs */}
       <Tabs value={tab} onValueChange={(v) => setTab(v as "monthly" | "annual")}>
-        <TabsList className="bg-muted/50 rounded-xl p-1">
+        <TabsList className="bg-muted/40 rounded-xl p-1">
           <TabsTrigger value="monthly" className="gap-2 rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm">
-            <TrendingDown className="w-4 h-4 text-indigo-600" />
+            <TrendingDown className="w-4 h-4 text-primary" />
             Metas Mensais
           </TabsTrigger>
           <TabsTrigger value="annual" className="gap-2 rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm">
@@ -352,7 +352,7 @@ export default function Metas() {
         {/* Monthly Tab */}
         <TabsContent value="monthly" className="mt-4 space-y-4">
           {/* Month navigator */}
-          <div className="flex items-center justify-between bg-white rounded-2xl border border-border px-5 py-3 shadow-sm">
+          <div className="card-premium flex items-center justify-between px-5 py-3">
             <button
               onClick={() => navigateMonth(-1)}
               className="p-1.5 rounded-lg hover:bg-muted transition-colors"
@@ -369,7 +369,7 @@ export default function Metas() {
           </div>
 
           {loadingMonthly ? (
-            <div className="bg-white rounded-2xl border border-border p-8 text-center text-sm text-muted-foreground">Carregando...</div>
+            <div className="card-premium p-8 text-center text-sm text-muted-foreground">Carregando...</div>
           ) : monthlyGoals.length === 0 ? (
             <EmptyState
               type="monthly"
@@ -390,7 +390,7 @@ export default function Metas() {
                 return (
                   <div
                     key={goal.id}
-                    className="bg-white rounded-2xl border border-border p-5 shadow-sm space-y-4"
+                    className="card-premium p-5 space-y-4"
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex items-center gap-3">

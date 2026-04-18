@@ -161,18 +161,18 @@ export default function Relatorios() {
   const MONTHS_LABEL = "Últimos 6 meses";
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold text-foreground">Relatórios</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">Análise financeira dos {MONTHS_LABEL}</p>
+          <h1 className="text-xl font-semibold tracking-tight text-foreground">Relatórios</h1>
+          <p className="text-xs text-muted-foreground mt-0.5">Análise financeira dos {MONTHS_LABEL}</p>
         </div>
 
         {/* Export + Month selector */}
         <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3">
           {/* Month navigator */}
-          <div className="flex items-center gap-1 bg-white border border-border rounded-xl px-2 py-1.5 shadow-sm">
+          <div className="flex items-center gap-1 card-premium px-2 py-1.5">
             <button
               onClick={() => setSelectedMonth(prevMonth(selectedMonth))}
               className="p-1 rounded-lg hover:bg-muted transition-colors"
@@ -227,19 +227,19 @@ export default function Relatorios() {
       </div>
 
       {/* Summary Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {[
           { label: "Total Recebido", value: totals.income, icon: TrendingUp, color: "text-emerald-600", bg: "bg-emerald-50" },
           { label: "Total Gasto", value: totals.expense, icon: TrendingDown, color: "text-red-500", bg: "bg-red-50" },
           { label: "Saldo Acumulado", value: totals.balance, icon: Wallet, color: totals.balance >= 0 ? "text-emerald-600" : "text-red-500", bg: totals.balance >= 0 ? "bg-emerald-50" : "bg-red-50" },
-          { label: "Saldo Médio/Mês", value: totals.avgBalance, icon: BarChart3, color: totals.avgBalance >= 0 ? "text-indigo-600" : "text-red-500", bg: totals.avgBalance >= 0 ? "bg-indigo-50" : "bg-red-50" },
+          { label: "Saldo Médio/Mês", value: totals.avgBalance, icon: BarChart3, color: totals.avgBalance >= 0 ? "text-primary" : "text-red-500", bg: totals.avgBalance >= 0 ? "bg-primary/10" : "bg-red-50" },
         ].map((card) => (
-          <div key={card.label} className="bg-white rounded-2xl border border-border p-5 shadow-sm">
-            <div className={`w-10 h-10 rounded-xl ${card.bg} flex items-center justify-center mb-3`}>
-              <card.icon className={`w-5 h-5 ${card.color}`} />
+          <div key={card.label} className="card-premium p-5">
+            <div className={`w-9 h-9 rounded-xl ${card.bg} flex items-center justify-center mb-3`}>
+              <card.icon className={`w-4 h-4 ${card.color}`} />
             </div>
             <p className="text-xs text-muted-foreground font-medium">{card.label}</p>
-            <p className={`text-xl font-bold mt-1 ${card.color}`}>
+            <p className={`text-xl font-bold mt-1 tabular-nums ${card.color}`}>
               {isLoading ? "..." : formatCurrency(card.value)}
             </p>
           </div>
@@ -247,7 +247,7 @@ export default function Relatorios() {
       </div>
 
       {/* Bar Chart - Receitas vs Despesas */}
-      <div className="bg-white rounded-2xl border border-border p-6 shadow-sm">
+      <div className="card-premium p-5 lg:p-6">
         <h2 className="text-sm font-semibold text-foreground mb-1">Receitas vs Despesas</h2>
         <p className="text-xs text-muted-foreground mb-4">{MONTHS_LABEL}</p>
         {isLoading ? (
@@ -263,7 +263,7 @@ export default function Relatorios() {
                 contentStyle={{ borderRadius: "12px", border: "1px solid #e2e8f0", fontSize: "12px" }}
               />
               <Legend formatter={(v) => <span style={{ fontSize: "12px", color: "#64748b" }}>{v}</span>} />
-              <Bar dataKey="Receitas" fill="#10b981" radius={[6, 6, 0, 0]} />
+              <Bar dataKey="Receitas" fill="#22c55e" radius={[6, 6, 0, 0]} />
               <Bar dataKey="Despesas" fill="#ef4444" radius={[6, 6, 0, 0]} />
             </BarChart>
           </ResponsiveContainer>
@@ -272,7 +272,7 @@ export default function Relatorios() {
 
       {/* Line Chart + Pie Chart */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <div className="bg-white rounded-2xl border border-border p-6 shadow-sm">
+        <div className="card-premium p-5 lg:p-6">
           <h2 className="text-sm font-semibold text-foreground mb-1">Evolução do Saldo</h2>
           <p className="text-xs text-muted-foreground mb-4">{MONTHS_LABEL}</p>
           {isLoading ? (
@@ -280,19 +280,19 @@ export default function Relatorios() {
           ) : (
             <ResponsiveContainer width="100%" height={200}>
               <LineChart data={lineData} margin={{ top: 5, right: 10, left: 0, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="#f1f5f9" />
-                <XAxis dataKey="month" tick={{ fontSize: 12, fill: "#94a3b8" }} axisLine={false} tickLine={false} />
+                <CartesianGrid strokeDasharray="3 3" stroke="oklch(0.91 0.01 240)" />
+                <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#94a3b8" }} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fontSize: 11, fill: "#94a3b8" }} axisLine={false} tickLine={false} tickFormatter={(v) => `R$${(v / 1000).toFixed(0)}k`} />
                 <Tooltip
                   formatter={(value: number) => formatCurrency(value)}
-                  contentStyle={{ borderRadius: "12px", border: "1px solid #e2e8f0", fontSize: "12px" }}
+                  contentStyle={{ borderRadius: "12px", border: "1px solid #e2e8f0", fontSize: "12px", boxShadow: "0 4px 12px rgba(0,0,0,0.08)" }}
                 />
                 <Line
                   type="monotone"
                   dataKey="Saldo"
-                  stroke="#6366f1"
+                  stroke="#22c55e"
                   strokeWidth={2.5}
-                  dot={{ fill: "#6366f1", r: 4 }}
+                  dot={{ fill: "#22c55e", r: 4 }}
                   activeDot={{ r: 6 }}
                 />
               </LineChart>
@@ -301,7 +301,7 @@ export default function Relatorios() {
         </div>
 
         {/* Pie Chart — uses selectedMonth */}
-        <div className="bg-white rounded-2xl border border-border p-6 shadow-sm">
+        <div className="card-premium p-5 lg:p-6">
           <h2 className="text-sm font-semibold text-foreground mb-1">Despesas por Categoria</h2>
           <p className="text-xs text-muted-foreground mb-4">{monthFullLabel(selectedMonth)}</p>
           {pieData.length === 0 ? (
@@ -337,15 +337,15 @@ export default function Relatorios() {
       </div>
 
       {/* Monthly Detail Table */}
-      <div className="bg-white rounded-2xl border border-border shadow-sm overflow-hidden">
-        <div className="px-6 py-4 border-b border-border flex items-center justify-between">
+      <div className="card-premium overflow-hidden">
+        <div className="px-5 py-4 border-b border-border flex items-center justify-between">
           <h2 className="text-sm font-semibold text-foreground">Detalhamento Mensal</h2>
           <span className="text-xs text-muted-foreground">{MONTHS_LABEL}</span>
         </div>
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-border bg-muted/30">
+              <tr className="border-b border-border bg-muted/20">
                 <th className="text-left text-xs font-semibold text-muted-foreground px-6 py-3 uppercase tracking-wider">Mês</th>
                 <th className="text-right text-xs font-semibold text-muted-foreground px-4 py-3 uppercase tracking-wider">Receitas</th>
                 <th className="text-right text-xs font-semibold text-muted-foreground px-4 py-3 uppercase tracking-wider">Despesas</th>

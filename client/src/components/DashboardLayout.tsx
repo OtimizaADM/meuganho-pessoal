@@ -117,7 +117,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   if (!user) {
     return (
-      <div className="min-h-screen w-full bg-background lg:grid lg:grid-cols-[1.05fr,1fr]">
+      <div className="min-h-screen w-full bg-background grid grid-cols-1 lg:grid-cols-[1.05fr_1fr]">
         {/* Brand side — dark navy */}
         <aside
           className="relative overflow-hidden text-white px-6 py-10 lg:px-14 lg:py-14 lg:flex lg:flex-col lg:justify-between min-h-[260px] lg:min-h-screen"

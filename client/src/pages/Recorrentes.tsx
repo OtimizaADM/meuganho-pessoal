@@ -209,16 +209,16 @@ export default function Recorrentes() {
   const totalMonthly = items.reduce((s, i) => s + parseFloat(i.amount as unknown as string), 0);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-foreground">Recorrentes</h1>
+          <h1 className="text-xl font-semibold tracking-tight text-foreground">Recorrentes</h1>
           <p className="text-sm text-muted-foreground mt-0.5">Receitas e despesas fixas mensais</p>
         </div>
         <Button
           onClick={() => openCreate(tab)}
-          className="gap-2 bg-indigo-600 hover:bg-indigo-700 text-white"
+          className="gap-2 rounded-full"
         >
           <Plus className="w-4 h-4" />
           Novo {tab === "income" ? "Recebimento" : "Gasto"} Fixo
@@ -239,7 +239,7 @@ export default function Recorrentes() {
         </TabsList>
 
         {/* Summary card */}
-        <div className="mt-4 bg-white rounded-2xl border border-border p-5 shadow-sm flex items-center gap-4">
+        <div className="mt-4 card-premium p-5 flex items-center gap-4">
           <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${tab === "income" ? "bg-emerald-50" : "bg-red-50"}`}>
             <RefreshCw className={`w-5 h-5 ${tab === "income" ? "text-emerald-600" : "text-red-500"}`} />
           </div>
@@ -491,7 +491,7 @@ function ItemList({
   }
 
   return (
-    <div className="bg-white rounded-2xl border border-border shadow-sm overflow-hidden">
+    <div className="card-premium overflow-hidden">
       <div className="divide-y divide-border">
         {items.map((item) => {
           const cat = item.categoryId ? catMap.get(item.categoryId) : null;

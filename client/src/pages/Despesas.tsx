@@ -329,16 +329,16 @@ export default function Despesas() {
   }, [expenses]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div>
-          <h1 className="text-2xl font-semibold text-foreground">Despesas</h1>
-          <p className="text-sm text-muted-foreground mt-0.5">Controle seus gastos mensais</p>
+          <h1 className="text-xl font-semibold tracking-tight text-foreground">Despesas</h1>
+          <p className="text-xs text-muted-foreground mt-0.5">Controle seus gastos mensais</p>
         </div>
         <div className="flex items-center gap-3">
           <MonthPicker value={month} onChange={setMonth} />
-          <Button onClick={openCreate} size="sm" className="gap-2 bg-indigo-600 hover:bg-indigo-700 text-white">
+          <Button onClick={openCreate} size="sm" className="gap-2 rounded-full">
             <Plus className="w-4 h-4" />
             Nova Despesa
           </Button>
@@ -346,36 +346,36 @@ export default function Despesas() {
       </div>
 
       {/* Summary */}
-      <div className="grid grid-cols-1 sm:grid-cols-4 gap-4">
-        <div className="bg-white rounded-2xl border border-border p-5 flex items-center gap-4 shadow-sm sm:col-span-1">
-          <div className="w-12 h-12 rounded-xl bg-red-50 flex items-center justify-center">
-            <TrendingDown className="w-6 h-6 text-red-500" />
+      <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
+        <div className="card-premium p-5 flex items-center gap-3 sm:col-span-1">
+          <div className="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center flex-shrink-0">
+            <TrendingDown className="w-5 h-5 text-red-500" />
           </div>
           <div>
-            <p className="text-xs text-muted-foreground">Total do Mês</p>
-            <p className="text-xl font-bold text-red-500">{formatCurrency(totalMonth)}</p>
+            <p className="text-xs text-muted-foreground font-medium">Total do Mês</p>
+            <p className="text-xl font-bold text-red-500 tabular-nums">{formatCurrency(totalMonth)}</p>
           </div>
         </div>
-        <div className="bg-white rounded-2xl border border-emerald-200 p-5 flex items-center gap-4 shadow-sm sm:col-span-1">
-          <div className="w-12 h-12 rounded-xl bg-emerald-50 flex items-center justify-center">
-            <CheckCircle2 className="w-6 h-6 text-emerald-600" />
+        <div className="card-premium p-5 flex items-center gap-3 sm:col-span-1">
+          <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center flex-shrink-0">
+            <CheckCircle2 className="w-5 h-5 text-emerald-600" />
           </div>
           <div>
-            <p className="text-xs text-muted-foreground">Pagas</p>
-            <p className="text-xl font-bold text-emerald-600">{formatCurrency(totalPaid)}</p>
+            <p className="text-xs text-muted-foreground font-medium">Pagas</p>
+            <p className="text-xl font-bold text-emerald-600 tabular-nums">{formatCurrency(totalPaid)}</p>
           </div>
         </div>
-        <div className="bg-white rounded-2xl border border-amber-200 p-5 flex items-center gap-4 shadow-sm sm:col-span-1">
-          <div className="w-12 h-12 rounded-xl bg-amber-50 flex items-center justify-center">
-            <Clock className="w-6 h-6 text-amber-600" />
+        <div className="card-premium p-5 flex items-center gap-3 sm:col-span-1">
+          <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center flex-shrink-0">
+            <Clock className="w-5 h-5 text-amber-600" />
           </div>
           <div>
-            <p className="text-xs text-muted-foreground">Pendentes</p>
-            <p className="text-xl font-bold text-amber-600">{formatCurrency(totalPending)}</p>
+            <p className="text-xs text-muted-foreground font-medium">Pendentes</p>
+            <p className="text-xl font-bold text-amber-600 tabular-nums">{formatCurrency(totalPending)}</p>
           </div>
         </div>
-        <div className="bg-white rounded-2xl border border-border p-5 shadow-sm sm:col-span-1">
-          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">Top Categorias</p>
+        <div className="card-premium p-5 sm:col-span-1">
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2.5">Top Categorias</p>
           <div className="space-y-1.5">
             {byCategory.length === 0 ? (
               <p className="text-xs text-muted-foreground">Nenhum dado</p>
@@ -397,10 +397,10 @@ export default function Despesas() {
           <button
             key={s}
             onClick={() => setFilterStatus(s)}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+            className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
               filterStatus === s
-                ? "bg-indigo-600 text-white"
-                : "bg-white border border-border text-muted-foreground hover:text-foreground"
+                ? "bg-primary text-primary-foreground"
+                : "bg-card border border-border text-muted-foreground hover:text-foreground"
             }`}
           >
             {s === "all" ? `Todas (${expenses.length})` : s === "pending" ? `Pendentes (${expenses.filter((e) => !e.isPaid).length})` : `Pagas (${expenses.filter((e) => e.isPaid).length})`}
@@ -409,21 +409,21 @@ export default function Despesas() {
       </div>
 
       {/* Table */}
-      <div className="bg-white rounded-2xl border border-border shadow-sm overflow-hidden">
+      <div className="card-premium overflow-hidden">
         {isLoading ? (
-          <div className="flex items-center justify-center h-48 text-muted-foreground">Carregando...</div>
+          <div className="flex items-center justify-center h-40 text-muted-foreground text-sm">Carregando...</div>
         ) : filteredExpenses.length === 0 ? (
-          <div className="flex flex-col items-center justify-center h-48 gap-3 text-muted-foreground">
-            <TrendingDown className="w-10 h-10 opacity-30" />
+          <div className="flex flex-col items-center justify-center h-40 gap-3 text-muted-foreground">
+            <TrendingDown className="w-9 h-9 opacity-25" />
             <p className="text-sm">Nenhuma despesa encontrada.</p>
-            <Button variant="outline" size="sm" onClick={openCreate} className="gap-2">
+            <Button variant="outline" size="sm" onClick={openCreate} className="gap-2 rounded-full">
               <Plus className="w-4 h-4" /> Adicionar despesa
             </Button>
           </div>
         ) : (
           <table className="w-full">
             <thead>
-              <tr className="border-b border-border bg-muted/30">
+              <tr className="border-b border-border bg-muted/20">
                 <th className="text-left text-xs font-semibold text-muted-foreground px-4 py-3 uppercase tracking-wider w-10">Status</th>
                 <th className="text-left text-xs font-semibold text-muted-foreground px-4 py-3 uppercase tracking-wider">Descrição</th>
                 <th className="text-left text-xs font-semibold text-muted-foreground px-4 py-3 uppercase tracking-wider hidden sm:table-cell">Categoria</th>

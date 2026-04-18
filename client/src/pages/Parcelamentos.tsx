@@ -181,11 +181,11 @@ export default function Parcelamentos() {
   }, [installments]);
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-5">
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-2xl font-semibold text-foreground">Parcelamentos</h1>
+          <h1 className="text-xl font-semibold tracking-tight text-foreground">Parcelamentos</h1>
           <p className="text-sm text-muted-foreground mt-0.5">
             Registre uma vez — as parcelas aparecem automaticamente nos meses seguintes
           </p>
@@ -198,7 +198,7 @@ export default function Parcelamentos() {
 
       {/* Summary */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="bg-white rounded-2xl border border-border p-5 flex items-center gap-4 shadow-sm">
+        <div className="card-premium p-5 flex items-center gap-4">
           <div className="w-12 h-12 rounded-xl bg-amber-50 flex items-center justify-center">
             <ShoppingCart className="w-6 h-6 text-amber-600" />
           </div>
@@ -207,7 +207,7 @@ export default function Parcelamentos() {
             <p className="text-2xl font-bold text-foreground">{installments.length}</p>
           </div>
         </div>
-        <div className="bg-white rounded-2xl border border-border p-5 flex items-center gap-4 shadow-sm">
+        <div className="card-premium p-5 flex items-center gap-4">
           <div className="w-12 h-12 rounded-xl bg-indigo-50 flex items-center justify-center">
             <Layers className="w-6 h-6 text-indigo-600" />
           </div>
@@ -216,7 +216,7 @@ export default function Parcelamentos() {
             <p className="text-2xl font-bold text-indigo-600">{formatCurrency(totalActive)}</p>
           </div>
         </div>
-        <div className="bg-white rounded-2xl border border-border p-5 flex items-center gap-4 shadow-sm">
+        <div className="card-premium p-5 flex items-center gap-4">
           <div className="w-12 h-12 rounded-xl bg-purple-50 flex items-center justify-center">
             <Calendar className="w-6 h-6 text-purple-600" />
           </div>
@@ -252,7 +252,7 @@ export default function Parcelamentos() {
             const remaining = purchase.installmentCount - progress.paid;
 
             return (
-              <div key={purchase.id} className="bg-white rounded-2xl border border-border p-5 shadow-sm group">
+              <div key={purchase.id} className="card-premium p-5 group">
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
