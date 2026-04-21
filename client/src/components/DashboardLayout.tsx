@@ -42,7 +42,9 @@ import {
 import React, { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from "./DashboardLayoutSkeleton";
-import { Button } from "./ui/button";
+import { BlurText } from "./ui/blur-text";
+import { MagneticButton } from "./ui/magnetic-button";
+import { TiltCard } from "./ui/tilt-card";
 import { Threads } from "./ui/threads";
 
 function AuthFeature({
@@ -141,12 +143,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
           {/* Logo */}
           <div className="relative flex items-center gap-2.5">
-            <div
-              className="w-9 h-9 rounded-xl flex items-center justify-center shrink-0"
-              style={{ background: "var(--sidebar-primary)" }}
-            >
-              <Wallet className="w-5 h-5 text-white" />
-            </div>
+            <img src="/logo-white.svg" alt="Meu Ganho Pessoal" className="w-9 h-9 shrink-0" />
             <span className="font-semibold text-[16px] tracking-tight text-white">
               Meu Ganho <span className="text-white/50">Pessoal</span>
             </span>
@@ -193,26 +190,28 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
         {/* Form side — light */}
         <main className="relative flex flex-col px-6 py-10 lg:px-16 lg:py-14 bg-background">
           <div className="flex-1 flex items-center justify-center py-10 lg:py-0">
-            <div className="w-full max-w-[380px] flex flex-col items-center gap-8">
-              <div className="flex flex-col items-center gap-4 text-center">
-                <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center">
-                  <Wallet className="w-7 h-7 text-primary" />
+            <TiltCard className="w-full max-w-[380px]">
+              <div className="flex flex-col items-center gap-8 rounded-2xl border bg-card p-8 shadow-sm">
+                <div className="flex flex-col items-center gap-4 text-center">
+                  <img src="/logo.svg" alt="Meu Ganho Pessoal" className="w-14 h-14" />
+                  <div>
+                    <h2 className="text-2xl font-semibold tracking-tight">
+                      <BlurText text="Bem-vindo de volta" />
+                    </h2>
+                    <p className="text-sm text-muted-foreground mt-2 max-w-xs">
+                      Faça login para acessar seu painel financeiro pessoal.
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <h2 className="text-2xl font-semibold tracking-tight">Bem-vindo de volta</h2>
-                  <p className="text-sm text-muted-foreground mt-2 max-w-xs">
-                    Faça login para acessar seu painel financeiro pessoal.
-                  </p>
-                </div>
+                <MagneticButton
+                  onClick={() => { window.location.href = getLoginUrl(); }}
+                  size="lg"
+                  className="w-full h-12 text-base font-medium"
+                >
+                  Entrar na plataforma
+                </MagneticButton>
               </div>
-              <Button
-                onClick={() => { window.location.href = getLoginUrl(); }}
-                size="lg"
-                className="w-full h-12 text-base font-medium"
-              >
-                Entrar na plataforma
-              </Button>
-            </div>
+            </TiltCard>
           </div>
           <p className="text-[11px] text-muted-foreground text-center lg:text-left">
             Ao continuar, você concorda com os{" "}
