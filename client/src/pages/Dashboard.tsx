@@ -599,30 +599,6 @@ export default function Dashboard() {
           )}
         </div>
 
-        <div className="card-premium p-5 lg:p-6">
-          <h2 className="text-sm font-semibold text-foreground mb-4">Despesas por Categoria</h2>
-          {pieData.length === 0 ? (
-            <div className="h-48 flex flex-col items-center justify-center text-muted-foreground gap-2">
-              <TrendingDown className="w-7 h-7 opacity-25" />
-              <p className="text-xs">Sem despesas no mês</p>
-            </div>
-          ) : (
-            <ResponsiveContainer width="100%" height={210}>
-              <PieChart>
-                <Pie data={pieData} cx="50%" cy="50%" innerRadius={48} outerRadius={78} paddingAngle={3} dataKey="value">
-                  {pieData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-                <Tooltip
-                  formatter={(value: number) => formatCurrency(value)}
-                  contentStyle={{ borderRadius: "12px", border: "1px solid #e2e8f0", fontSize: "12px", boxShadow: "0 4px 12px rgba(0,0,0,0.08)" }}
-                />
-                <Legend formatter={(value) => <span style={{ fontSize: "11px", color: "#64748b" }}>{value}</span>} />
-              </PieChart>
-            </ResponsiveContainer>
-          )}
-        </div>
       </div>
 
       {/* Recent Activity */}
