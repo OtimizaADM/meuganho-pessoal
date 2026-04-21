@@ -19,7 +19,6 @@ import {
 import {
   TrendingUp,
   TrendingDown,
-  CreditCard,
   Wallet,
   BarChart3,
   FileSpreadsheet,
