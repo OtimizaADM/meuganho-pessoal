@@ -43,6 +43,7 @@ import React, { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from "./DashboardLayoutSkeleton";
 import { Button } from "./ui/button";
+import { Threads } from "./ui/threads";
 
 function AuthFeature({
   icon: Icon,
@@ -123,29 +124,19 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
           className="relative overflow-hidden text-white px-6 py-10 lg:px-14 lg:py-14 lg:flex lg:flex-col lg:justify-between min-h-[260px] lg:min-h-screen"
           style={{ background: "var(--sidebar)" }}
         >
-          {/* Subtle grid pattern */}
+          {/* Threads — background 3D animado */}
+          <div aria-hidden className="absolute inset-0">
+            <Threads
+              color={[34, 197, 94]}
+              amplitude={0.55}
+              distance={30}
+              enableMouseInteraction={true}
+            />
+          </div>
           <div
             aria-hidden
-            className="absolute inset-0 opacity-[0.12]"
-            style={{
-              backgroundImage:
-                "linear-gradient(oklch(0.60 0.22 265 / 0.5) 1px, transparent 1px), linear-gradient(90deg, oklch(0.60 0.22 265 / 0.5) 1px, transparent 1px)",
-              backgroundSize: "56px 56px",
-              maskImage: "radial-gradient(ellipse 70% 60% at 30% 40%, #000 30%, transparent 75%)",
-              WebkitMaskImage: "radial-gradient(ellipse 70% 60% at 30% 40%, #000 30%, transparent 75%)",
-            }}
-          />
-          {/* Top glow */}
-          <div
-            aria-hidden
-            className="absolute -top-24 -right-20 w-[420px] h-[420px] rounded-full blur-3xl opacity-40"
-            style={{ background: "radial-gradient(circle, oklch(0.55 0.28 280), transparent 60%)" }}
-          />
-          {/* Bottom glow */}
-          <div
-            aria-hidden
-            className="absolute -bottom-32 -left-20 w-[380px] h-[380px] rounded-full blur-3xl opacity-25"
-            style={{ background: "radial-gradient(circle, oklch(0.50 0.25 295), transparent 60%)" }}
+            className="absolute inset-0 pointer-events-none"
+            style={{ background: "linear-gradient(135deg, rgba(0,0,0,0.45) 0%, transparent 50%, rgba(0,0,0,0.25) 100%)" }}
           />
 
           {/* Logo */}
