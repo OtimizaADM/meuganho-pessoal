@@ -34,20 +34,8 @@ import {
   PieChart,
   Pie,
   Cell,
-  Legend,
 } from "recharts";
 import { Button } from "@/components/ui/button";
-
-const DEFAULT_EXPENSE_CATEGORIES = [
-  { id: -1, name: "Alimentação", color: "#f59e0b" },
-  { id: -2, name: "Transporte", color: "#3b82f6" },
-  { id: -3, name: "Moradia", color: "#8b5cf6" },
-  { id: -4, name: "Saúde", color: "#ef4444" },
-  { id: -5, name: "Educação", color: "#06b6d4" },
-  { id: -6, name: "Lazer", color: "#ec4899" },
-  { id: -7, name: "Vestuário", color: "#f97316" },
-  { id: -8, name: "Outros", color: "#6b7280" },
-];
 
 function getNextMonth(month: string): string {
   const [year, m] = month.split("-").map(Number);
@@ -78,8 +66,6 @@ export default function Dashboard() {
 
   const { data: summary, isLoading: summaryLoading } = trpc.dashboard.summary.useQuery({ month });
   const { data: evolution = [], isLoading: evolutionLoading } = trpc.dashboard.evolution.useQuery({ months: last6Months });
-  const { data: expByCategory = [] } = trpc.dashboard.expensesByCategory.useQuery({ month });
-  const { data: expCategories = [] } = trpc.expenseCategories.list.useQuery();
   const { data: categoryBreakdown = [] } = trpc.dashboard.categoryBreakdown.useQuery({ month });
   const { data: recentIncomes = [] } = trpc.incomes.list.useQuery({ month });
   const { data: recentExpenses = [] } = trpc.expenses.list.useQuery({ month });
@@ -105,24 +91,6 @@ export default function Dashboard() {
       .filter((a) => a.daysUntilDue <= 7)
       .sort((a, b) => a.daysUntilDue - b.daysUntilDue);
   }, [dueCards]);
-
-  const allCategories = useMemo(() => {
-    const custom = expCategories.map((c) => ({ id: c.id, name: c.name, color: c.color }));
-    return [...DEFAULT_EXPENSE_CATEGORIES, ...custom];
-  }, [expCategories]);
-
-  const pieData = useMemo(() => {
-    return expByCategory
-      .filter((e) => parseFloat(e.total) > 0)
-      .map((e) => {
-        const cat = allCategories.find((c) => c.id === e.categoryId);
-        return {
-          name: cat?.name ?? "Sem categoria",
-          value: parseFloat(e.total),
-          color: cat?.color ?? "#6b7280",
-        };
-      });
-  }, [expByCategory, allCategories]);
 
   const evolutionData = useMemo(() => {
     return evolution.map((e) => ({
