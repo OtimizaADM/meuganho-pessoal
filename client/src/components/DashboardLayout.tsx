@@ -44,6 +44,7 @@ import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from "./DashboardLayoutSkeleton";
 import { BlurText } from "./ui/blur-text";
 import { MagneticButton } from "./ui/magnetic-button";
+import { ShinyText } from "./ui/shiny-text";
 import { TiltCard } from "./ui/tilt-card";
 import { Threads } from "./ui/threads";
 
@@ -294,9 +295,14 @@ function DashboardLayoutContent({
                   <div className="w-6 h-6 rounded-md bg-sidebar-primary flex items-center justify-center shrink-0">
                     <Wallet className="w-3.5 h-3.5 text-sidebar-primary-foreground" />
                   </div>
-                  <span className="font-semibold text-sm text-sidebar-foreground tracking-tight truncate">
-                    Meu Ganho Pessoal
-                  </span>
+                  <ShinyText
+                    text="Meu Ganho Pessoal"
+                    className="font-semibold text-sm tracking-tight truncate"
+                    color="oklch(0.75 0 0)"
+                    shineColor="oklch(1 0 0)"
+                    speed={4}
+                    spread={100}
+                  />
                 </div>
               )}
             </div>

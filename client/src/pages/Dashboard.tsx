@@ -36,6 +36,9 @@ import {
   Cell,
 } from "recharts";
 import { Button } from "@/components/ui/button";
+import { AnimatedContent } from "@/components/ui/animated-content";
+import { CurrencyCountUp } from "@/components/ui/count-up";
+import { GlareHover } from "@/components/ui/glare-hover";
 import DueAlertsCard from "@/components/dashboard/DueAlertsCard";
 
 function getNextMonth(month: string): string {
@@ -156,6 +159,7 @@ export default function Dashboard() {
       </div>
 
       {/* Hero: Balance card */}
+      <AnimatedContent delay={0.05}>
       <div
         className="relative overflow-hidden rounded-2xl p-6 lg:p-8"
         style={{ background: "var(--sidebar)" }}
@@ -183,7 +187,11 @@ export default function Dashboard() {
             <p className="text-[11px] uppercase tracking-widest text-white/55 font-medium">Saldo do mês</p>
             <div className="flex items-center gap-3 mt-1.5">
               <p className="text-4xl lg:text-5xl font-bold tracking-tight text-white tabular-nums">
-                {summaryLoading ? "..." : balanceHidden ? "••••••" : formatCurrency(balance)}
+                {summaryLoading
+                  ? <span className="opacity-40">R$ —</span>
+                  : balanceHidden
+                  ? "••••••"
+                  : <CurrencyCountUp value={balance} />}
               </p>
               <button
                 onClick={() => setBalanceHidden(!balanceHidden)}
@@ -199,45 +207,54 @@ export default function Dashboard() {
           </div>
 
           <div className="grid grid-cols-2 gap-3">
-            <button
+            <GlareHover
+              className="rounded-xl cursor-pointer"
+              glareColor="#ffffff"
+              glareOpacity={0.15}
+              glareSize={300}
+              style={{ background: "oklch(1 0 0 / 0.07)", border: "1px solid oklch(1 0 0 / 0.12)" }}
               onClick={() => setLocation("/receitas")}
-              className="rounded-xl p-4 text-left transition-colors"
-              style={{ background: "oklch(1 0 0 / 0.07)", border: "1px solid oklch(1 0 0 / 0.12)" }}
-              onMouseEnter={(e) => (e.currentTarget.style.background = "oklch(1 0 0 / 0.11)")}
-              onMouseLeave={(e) => (e.currentTarget.style.background = "oklch(1 0 0 / 0.07)")}
             >
-              <p className="text-[10px] text-white/55 uppercase tracking-widest font-medium">Receitas</p>
-              <p className="text-base font-bold text-white mt-1.5 tabular-nums">
-                {summaryLoading ? "..." : formatCurrency(totalReceitas)}
-              </p>
-              <div className="flex items-center gap-1 mt-1">
-                <TrendingUp className="w-3 h-3 text-emerald-400" />
-                <span className="text-[11px] text-emerald-400">Entradas</span>
+              <div className="p-4 text-left">
+                <p className="text-[10px] text-white/55 uppercase tracking-widest font-medium">Receitas</p>
+                <p className="text-base font-bold text-white mt-1.5 tabular-nums">
+                  {summaryLoading ? "..." : <CurrencyCountUp value={totalReceitas} />}
+                </p>
+                <div className="flex items-center gap-1 mt-1">
+                  <TrendingUp className="w-3 h-3 text-emerald-400" />
+                  <span className="text-[11px] text-emerald-400">Entradas</span>
+                </div>
               </div>
-            </button>
+            </GlareHover>
 
-            <button
-              onClick={() => setDespesasExpanded(!despesasExpanded)}
-              className="rounded-xl p-4 text-left transition-colors"
+            <GlareHover
+              className="rounded-xl cursor-pointer"
+              glareColor="#ffffff"
+              glareOpacity={0.15}
+              glareSize={300}
               style={{ background: "oklch(1 0 0 / 0.07)", border: "1px solid oklch(1 0 0 / 0.12)" }}
-              onMouseEnter={(e) => (e.currentTarget.style.background = "oklch(1 0 0 / 0.11)")}
-              onMouseLeave={(e) => (e.currentTarget.style.background = "oklch(1 0 0 / 0.07)")}
+              onClick={() => setDespesasExpanded(!despesasExpanded)}
             >
-              <p className="text-[10px] text-white/55 uppercase tracking-widest font-medium">Despesas</p>
-              <p className="text-base font-bold text-white mt-1.5 tabular-nums">
-                {summaryLoading ? "..." : formatCurrency(totalDespesasReal)}
-              </p>
-              <div className="flex items-center gap-1 mt-1">
-                <TrendingDown className="w-3 h-3 text-red-400" />
-                <span className="text-[11px] text-red-400">Saídas</span>
+              <div className="p-4 text-left">
+                <p className="text-[10px] text-white/55 uppercase tracking-widest font-medium">Despesas</p>
+                <p className="text-base font-bold text-white mt-1.5 tabular-nums">
+                  {summaryLoading ? "..." : <CurrencyCountUp value={totalDespesasReal} />}
+                </p>
+                <div className="flex items-center gap-1 mt-1">
+                  <TrendingDown className="w-3 h-3 text-red-400" />
+                  <span className="text-[11px] text-red-400">Saídas</span>
+                </div>
               </div>
-            </button>
+            </GlareHover>
           </div>
         </div>
       </div>
+      </AnimatedContent>
 
       {/* Alertas de Vencimento */}
+      <AnimatedContent delay={0.1}>
       <DueAlertsCard dueAlerts={dueAlerts} />
+      </AnimatedContent>
 
       {/* Despesas breakdown (expandable) */}
       {despesasExpanded && (
@@ -292,6 +309,7 @@ export default function Dashboard() {
       )}
 
       {/* Distribuição de Despesas por Categoria */}
+      <AnimatedContent delay={0.05}>
       <div className="card-premium overflow-hidden">
         <div className="flex items-center gap-2 px-6 py-4 border-b border-border">
           <TrendingDown className="w-4 h-4 text-red-500" />
@@ -373,8 +391,10 @@ export default function Dashboard() {
           </div>
         )}
       </div>
+      </AnimatedContent>
 
       {/* Compromissos Futuros + Próximos Pagamentos */}
+      <AnimatedContent delay={0.05}>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         {/* Compromissos do Próximo Mês */}
         <div className="card-premium overflow-hidden">
@@ -504,8 +524,10 @@ export default function Dashboard() {
           )}
         </div>
       </div>
+      </AnimatedContent>
 
       {/* Charts Row */}
+      <AnimatedContent delay={0.05}>
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
         <div className="lg:col-span-2 card-premium p-5 lg:p-6">
           <h2 className="text-sm font-semibold text-foreground mb-4">Evolução dos Últimos 6 Meses</h2>
@@ -539,8 +561,10 @@ export default function Dashboard() {
         </div>
 
       </div>
+      </AnimatedContent>
 
       {/* Recent Activity */}
+      <AnimatedContent delay={0.05}>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div className="card-premium overflow-hidden">
           <div className="flex items-center justify-between px-5 py-4 border-b border-border">
@@ -606,6 +630,7 @@ export default function Dashboard() {
           )}
         </div>
       </div>
+      </AnimatedContent>
     </div>
   );
 }
