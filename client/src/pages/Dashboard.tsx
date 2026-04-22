@@ -427,8 +427,9 @@ export default function Dashboard() {
       <DueAlertsCard dueAlerts={dueAlerts} />
       </AnimatedContent>
 
-      {/* Receitas por origem */}
-      <div className="card-premium overflow-hidden">
+      <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
+        {/* Receitas por origem */}
+        <div className="card-premium overflow-hidden">
         <div className="flex items-center gap-2 px-5 py-3.5 border-b border-border">
           <TrendingUp className="w-3.5 h-3.5 text-emerald-600" />
           <h2 className="text-sm font-semibold text-foreground">Receitas por Origem</h2>
@@ -552,6 +553,7 @@ export default function Dashboard() {
               {formatCurrency(totalPending)} pendente
             </span>
           </div>
+        </div>
         </div>
       </div>
 
