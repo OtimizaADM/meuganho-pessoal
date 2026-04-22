@@ -196,11 +196,8 @@ function AuthScreen({ onSuccess }: { onSuccess: () => void }) {
         />
 
         {/* Logo */}
-        <div className="relative flex items-center gap-2.5">
-          <img src="/logo-white.svg" alt="Meu Ganho Pessoal" className="w-9 h-9 shrink-0" />
-          <span className="font-semibold text-[15px] tracking-tight text-white">
-            Meu Ganho <span className="text-white/45">Pessoal</span>
-          </span>
+        <div className="relative">
+          <img src="/logo-white.svg" alt="Meu Ganho" className="h-14 w-auto shrink-0 drop-shadow-[0_10px_24px_rgba(0,0,0,0.35)]" />
         </div>
 
         {/* Desktop: headline + features */}
@@ -248,8 +245,9 @@ function AuthScreen({ onSuccess }: { onSuccess: () => void }) {
         <div className="flex items-center justify-between px-8 py-6">
           {/* Mobile logo */}
           <div className="flex items-center gap-2 lg:hidden">
-            <img src="/logo.svg" alt="" className="w-7 h-7" />
-            <span className="font-semibold text-sm text-foreground">Meu Ganho</span>
+            <div className="rounded-xl bg-card px-2 py-1 shadow-sm ring-1 ring-border/60">
+              <img src="/logo.svg" alt="Meu Ganho" className="h-8 w-auto" />
+            </div>
           </div>
           <div className="hidden lg:block" />
 
