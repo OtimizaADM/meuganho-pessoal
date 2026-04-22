@@ -21,7 +21,6 @@ import {
   SidebarTrigger,
   useSidebar,
 } from "@/components/ui/sidebar";
-import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
 import {
   LayoutDashboard,
@@ -38,15 +37,17 @@ import {
   Wallet,
   RefreshCw,
   Target,
+  Check,
 } from "lucide-react";
 import React, { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
+import { cn } from "@/lib/utils";
 import { DashboardLayoutSkeleton } from "./DashboardLayoutSkeleton";
 import { BlurText } from "./ui/blur-text";
-import { MagneticButton } from "./ui/magnetic-button";
 import { ShinyText } from "./ui/shiny-text";
-import { TiltCard } from "./ui/tilt-card";
 import { Threads } from "./ui/threads";
+
+// ─── Auth Feature (left side) ────────────────────────────────────────────────
 
 function AuthFeature({
   icon: Icon,
@@ -69,6 +70,306 @@ function AuthFeature({
     </li>
   );
 }
+
+// ─── Magnetic submit button (inline, no shadcn deps) ─────────────────────────
+
+function SubmitButton({
+  loading,
+  label,
+}: {
+  loading: boolean;
+  label: string;
+}) {
+  const ref = useRef<HTMLButtonElement>(null);
+  const [xy, setXy] = useState({ x: 0, y: 0 });
+
+  return (
+    <button
+      ref={ref}
+      type="submit"
+      disabled={loading}
+      className="w-full h-14 bg-foreground text-background rounded-xl text-[15px] font-semibold
+                 transition-all duration-150 ease-out hover:opacity-90 active:scale-[0.99]
+                 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+      style={{ transform: `translate(${xy.x}px, ${xy.y}px)` }}
+      onMouseMove={(e) => {
+        const el = ref.current;
+        if (!el) return;
+        const r = el.getBoundingClientRect();
+        setXy({
+          x: (e.clientX - r.left - r.width / 2) * 0.28,
+          y: (e.clientY - r.top - r.height / 2) * 0.28,
+        });
+      }}
+      onMouseLeave={() => setXy({ x: 0, y: 0 })}
+    >
+      {loading ? (
+        <span className="opacity-60">Aguarde...</span>
+      ) : (
+        <>{label} →</>
+      )}
+    </button>
+  );
+}
+
+// ─── Auth screen (full login + register) ─────────────────────────────────────
+
+type AuthMode = "login" | "register";
+
+function AuthScreen({ onSuccess }: { onSuccess: () => void }) {
+  const [mode, setMode] = useState<AuthMode>("login");
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  function switchMode(next: AuthMode) {
+    setMode(next);
+    setError("");
+    setName("");
+    setPassword("");
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setLoading(true);
+    setError("");
+    try {
+      const url = mode === "login" ? "/api/auth/login" : "/api/auth/register";
+      const body =
+        mode === "login"
+          ? { email, password }
+          : { name, email, password };
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Erro inesperado. Tente novamente.");
+      onSuccess();
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Erro inesperado.");
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  const inputClass =
+    "w-full border-0 border-b border-border bg-transparent pb-3 pt-1 text-[15px] " +
+    "text-foreground placeholder:text-muted-foreground/40 focus:outline-none " +
+    "focus:border-foreground transition-colors duration-200";
+
+  const labelClass = "block text-[11px] font-semibold uppercase tracking-[0.1em] text-muted-foreground mb-1.5";
+
+  return (
+    <div className="min-h-screen w-full bg-background grid grid-cols-1 lg:grid-cols-[1.1fr_1fr]">
+
+      {/* ── LEFT: brand + Threads ── */}
+      <aside
+        className="relative overflow-hidden text-white px-6 py-10 lg:px-14 lg:py-14
+                   lg:flex lg:flex-col lg:justify-between min-h-[240px] lg:min-h-screen"
+        style={{ background: "var(--sidebar)" }}
+      >
+        {/* Threads 3D background */}
+        <div aria-hidden className="absolute inset-0">
+          <Threads
+            color={[34, 197, 94]}
+            amplitude={0.55}
+            distance={30}
+            enableMouseInteraction={true}
+          />
+        </div>
+        <div
+          aria-hidden
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background:
+              "linear-gradient(135deg, rgba(0,0,0,0.5) 0%, transparent 55%, rgba(0,0,0,0.3) 100%)",
+          }}
+        />
+
+        {/* Logo */}
+        <div className="relative flex items-center gap-2.5">
+          <img src="/logo-white.svg" alt="Meu Ganho Pessoal" className="w-9 h-9 shrink-0" />
+          <span className="font-semibold text-[15px] tracking-tight text-white">
+            Meu Ganho <span className="text-white/45">Pessoal</span>
+          </span>
+        </div>
+
+        {/* Desktop: headline + features */}
+        <div className="relative hidden lg:block max-w-[440px]">
+          <h1 className="text-[52px] xl:text-[60px] leading-[1.02] font-bold tracking-tighter text-white">
+            Suas finanças.
+            <br />
+            <span className="text-white/45">Sob controle.</span>
+          </h1>
+          <p className="mt-5 text-[14px] text-white/55 leading-relaxed max-w-xs">
+            Acompanhe receitas, despesas, cartões e metas em um único lugar — com a clareza de um banco premium.
+          </p>
+          <ul className="mt-10 space-y-4">
+            <AuthFeature icon={LineChart} title="Visão clara">
+              Gráficos minimais que mostram exatamente para onde vai o seu dinheiro.
+            </AuthFeature>
+            <AuthFeature icon={ShieldCheck} title="Privado por padrão">
+              Seus dados são seus. Criptografia ponta-a-ponta, sempre.
+            </AuthFeature>
+            <AuthFeature icon={Sparkles} title="Insights inteligentes">
+              Descubra padrões e oportunidades de economia automaticamente.
+            </AuthFeature>
+          </ul>
+        </div>
+
+        {/* Mobile: headline */}
+        <div className="relative lg:hidden mt-8">
+          <h1 className="text-3xl font-bold tracking-tight leading-tight text-white">
+            Suas finanças.
+            <br />
+            <span className="text-white/45">Sob controle.</span>
+          </h1>
+        </div>
+
+        {/* Footer */}
+        <div className="relative hidden lg:block">
+          <p className="text-[11px] text-white/30">© 2025 Meu Ganho Pessoal · Feito com cuidado</p>
+        </div>
+      </aside>
+
+      {/* ── RIGHT: form ── */}
+      <main className="relative flex flex-col bg-background min-h-screen">
+
+        {/* Top nav: mode toggle */}
+        <div className="flex items-center justify-between px-8 py-6">
+          {/* Mobile logo */}
+          <div className="flex items-center gap-2 lg:hidden">
+            <img src="/logo.svg" alt="" className="w-7 h-7" />
+            <span className="font-semibold text-sm text-foreground">Meu Ganho</span>
+          </div>
+          <div className="hidden lg:block" />
+
+          <p className="text-sm text-muted-foreground">
+            {mode === "login" ? (
+              <>
+                Novo aqui?{" "}
+                <button
+                  onClick={() => switchMode("register")}
+                  className="font-semibold text-foreground hover:underline underline-offset-2 transition-colors"
+                >
+                  Criar conta
+                </button>
+              </>
+            ) : (
+              <>
+                Já tem conta?{" "}
+                <button
+                  onClick={() => switchMode("login")}
+                  className="font-semibold text-foreground hover:underline underline-offset-2 transition-colors"
+                >
+                  Entrar
+                </button>
+              </>
+            )}
+          </p>
+        </div>
+
+        {/* Form area */}
+        <div className="flex-1 flex items-center justify-center px-8 pb-10">
+          <div className="w-full max-w-[400px]">
+
+            {/* Heading — BlurText reanimates on mode change */}
+            <div className="mb-8">
+              <h2 className="text-[40px] lg:text-[48px] font-bold tracking-tighter text-foreground leading-[1.05]">
+                <BlurText key={mode} text={mode === "login" ? "Bem-vindo de volta." : "Crie sua conta."} delay={0.06} />
+              </h2>
+              <p className="mt-3 text-[14px] text-muted-foreground leading-relaxed">
+                {mode === "login"
+                  ? "Acesse sua conta e continue de onde parou."
+                  : "Em menos de um minuto você está dentro. Sem cartão, sem ruído."}
+              </p>
+            </div>
+
+            <form onSubmit={handleSubmit} className="space-y-7">
+
+              {mode === "register" && (
+                <div>
+                  <label className={labelClass}>Nome</label>
+                  <input
+                    type="text"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="Seu nome"
+                    required
+                    autoComplete="name"
+                    className={inputClass}
+                  />
+                </div>
+              )}
+
+              <div>
+                <label className={labelClass}>E-mail</label>
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="voce@email.com"
+                  required
+                  autoComplete="email"
+                  className={inputClass}
+                />
+              </div>
+
+              <div>
+                <div className="flex items-center justify-between mb-1.5">
+                  <label className={cn(labelClass, "mb-0")}>Senha</label>
+                  {mode === "login" && (
+                    <span className="text-[12px] text-muted-foreground hover:text-foreground cursor-pointer transition-colors">
+                      Esqueci
+                    </span>
+                  )}
+                </div>
+                <input
+                  type="password"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder={mode === "login" ? "••••••••" : "Crie uma senha forte"}
+                  required
+                  minLength={mode === "register" ? 8 : undefined}
+                  autoComplete={mode === "login" ? "current-password" : "new-password"}
+                  className={inputClass}
+                />
+              </div>
+
+              {error && (
+                <p className="text-[13px] text-destructive -mt-2">{error}</p>
+              )}
+
+              <div className="pt-1">
+                <SubmitButton loading={loading} label={mode === "login" ? "Entrar" : "Criar conta"} />
+              </div>
+
+              {mode === "register" && (
+                <div className="flex items-center gap-2 text-[13px] text-muted-foreground">
+                  <Check className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
+                  Grátis para sempre
+                </div>
+              )}
+            </form>
+          </div>
+        </div>
+
+        {/* Bottom terms */}
+        <p className="px-8 pb-6 text-[11px] text-muted-foreground/60">
+          Ao continuar, você concorda com os{" "}
+          <span className="hover:underline underline-offset-2 cursor-pointer">Termos</span> e a{" "}
+          <span className="hover:underline underline-offset-2 cursor-pointer">Política de Privacidade</span>.
+        </p>
+      </main>
+    </div>
+  );
+}
+
+// ─── Menu items ───────────────────────────────────────────────────────────────
 
 const menuItems = [
   {
@@ -106,12 +407,14 @@ const DEFAULT_WIDTH = 260;
 const MIN_WIDTH = 200;
 const MAX_WIDTH = 360;
 
+// ─── Main layout ──────────────────────────────────────────────────────────────
+
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const [sidebarWidth, setSidebarWidth] = useState(() => {
     const saved = localStorage.getItem(SIDEBAR_WIDTH_KEY);
     return saved ? parseInt(saved, 10) : DEFAULT_WIDTH;
   });
-  const { loading, user } = useAuth();
+  const { loading, user, refresh } = useAuth();
 
   useEffect(() => {
     localStorage.setItem(SIDEBAR_WIDTH_KEY, sidebarWidth.toString());
@@ -119,110 +422,7 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   if (loading) return <DashboardLayoutSkeleton />;
 
-  if (!user) {
-    return (
-      <div className="min-h-screen w-full bg-background grid grid-cols-1 lg:grid-cols-[1.05fr_1fr]">
-        {/* Brand side — dark navy */}
-        <aside
-          className="relative overflow-hidden text-white px-6 py-10 lg:px-14 lg:py-14 lg:flex lg:flex-col lg:justify-between min-h-[260px] lg:min-h-screen"
-          style={{ background: "var(--sidebar)" }}
-        >
-          {/* Threads — background 3D animado */}
-          <div aria-hidden className="absolute inset-0">
-            <Threads
-              color={[34, 197, 94]}
-              amplitude={0.55}
-              distance={30}
-              enableMouseInteraction={true}
-            />
-          </div>
-          <div
-            aria-hidden
-            className="absolute inset-0 pointer-events-none"
-            style={{ background: "linear-gradient(135deg, rgba(0,0,0,0.45) 0%, transparent 50%, rgba(0,0,0,0.25) 100%)" }}
-          />
-
-          {/* Logo */}
-          <div className="relative flex items-center gap-2.5">
-            <img src="/logo-white.svg" alt="Meu Ganho Pessoal" className="w-9 h-9 shrink-0" />
-            <span className="font-semibold text-[16px] tracking-tight text-white">
-              Meu Ganho <span className="text-white/50">Pessoal</span>
-            </span>
-          </div>
-
-          {/* Desktop headline + features */}
-          <div className="relative hidden lg:block max-w-md mt-16">
-            <h1 className="text-[44px] xl:text-[50px] leading-[1.05] font-semibold tracking-tighter text-white">
-              Suas finanças.
-              <br />
-              <span className="text-white/50">Sob controle.</span>
-            </h1>
-            <p className="mt-5 text-[15px] text-white/60 leading-relaxed max-w-sm">
-              Acompanhe receitas, despesas, cartões e metas em um único lugar — com a clareza de um banco premium.
-            </p>
-            <ul className="mt-10 space-y-4">
-              <AuthFeature icon={LineChart} title="Visão clara">
-                Gráficos minimais que mostram exatamente para onde vai o seu dinheiro.
-              </AuthFeature>
-              <AuthFeature icon={ShieldCheck} title="Privado por padrão">
-                Seus dados são seus. Criptografia ponta-a-ponta, sempre.
-              </AuthFeature>
-              <AuthFeature icon={Sparkles} title="Insights inteligentes">
-                Descubra padrões e oportunidades de economia automaticamente.
-              </AuthFeature>
-            </ul>
-          </div>
-
-          {/* Mobile headline */}
-          <div className="relative lg:hidden mt-8">
-            <h1 className="text-3xl font-semibold tracking-tight leading-tight text-white">
-              Suas finanças.
-              <br />
-              <span className="text-white/50">Sob controle.</span>
-            </h1>
-          </div>
-
-          {/* Brand footer */}
-          <div className="relative hidden lg:block">
-            <p className="text-[12px] text-white/35">© 2025 Meu Ganho Pessoal · Feito com cuidado</p>
-          </div>
-        </aside>
-
-        {/* Form side — light */}
-        <main className="relative flex flex-col px-6 py-10 lg:px-16 lg:py-14 bg-background">
-          <div className="flex-1 flex items-center justify-center py-10 lg:py-0">
-            <TiltCard className="w-full max-w-[380px]">
-              <div className="flex flex-col items-center gap-8 rounded-2xl border bg-card p-8 shadow-sm">
-                <div className="flex flex-col items-center gap-4 text-center">
-                  <img src="/logo.svg" alt="Meu Ganho Pessoal" className="w-14 h-14" />
-                  <div>
-                    <h2 className="text-2xl font-semibold tracking-tight">
-                      <BlurText text="Bem-vindo de volta" />
-                    </h2>
-                    <p className="text-sm text-muted-foreground mt-2 max-w-xs">
-                      Faça login para acessar seu painel financeiro pessoal.
-                    </p>
-                  </div>
-                </div>
-                <MagneticButton
-                  onClick={() => { window.location.href = getLoginUrl(); }}
-                  size="lg"
-                  className="w-full h-12 text-base font-medium"
-                >
-                  Entrar na plataforma
-                </MagneticButton>
-              </div>
-            </TiltCard>
-          </div>
-          <p className="text-[11px] text-muted-foreground text-center lg:text-left">
-            Ao continuar, você concorda com os{" "}
-            <span className="underline-offset-2 hover:underline cursor-pointer">Termos</span> e a{" "}
-            <span className="underline-offset-2 hover:underline cursor-pointer">Política de Privacidade</span>.
-          </p>
-        </main>
-      </div>
-    );
-  }
+  if (!user) return <AuthScreen onSuccess={refresh} />;
 
   return (
     <SidebarProvider style={{ "--sidebar-width": `${sidebarWidth}px` } as CSSProperties}>
@@ -232,6 +432,8 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     </SidebarProvider>
   );
 }
+
+// ─── Dashboard layout content (authenticated) ────────────────────────────────
 
 function DashboardLayoutContent({
   children,
