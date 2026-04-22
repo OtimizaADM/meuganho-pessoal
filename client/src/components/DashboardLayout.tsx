@@ -244,15 +244,8 @@ function AuthScreen({ onSuccess }: { onSuccess: () => void }) {
         {/* Top nav: mode toggle */}
         <div className="flex items-center justify-between px-8 py-6">
           {/* Mobile logo */}
-<<<<<<< HEAD
-          <div className="flex items-center gap-2 lg:hidden">
-            <div className="rounded-xl bg-card px-2 py-1 shadow-sm ring-1 ring-border/60">
-              <img src="/logo.svg" alt="Meu Ganho" className="h-8 w-auto" />
-            </div>
-=======
           <div className="lg:hidden">
             <Logo variant="dark" size="sm" />
->>>>>>> 25f2511 (feat(brand): logo real do Meu Ganho em todo o sistema)
           </div>
           <div className="hidden lg:block" />
 
