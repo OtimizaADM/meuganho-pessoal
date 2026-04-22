@@ -28,6 +28,9 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { AnimatedContent } from "@/components/ui/animated-content";
+import { CurrencyCountUp } from "@/components/ui/count-up";
+import { SpotlightCard } from "@/components/ui/spotlight-card";
 import { toast } from "sonner";
 
 const DEFAULT_EXPENSE_CATEGORIES = [
@@ -226,26 +229,29 @@ export default function Relatorios() {
       </div>
 
       {/* Summary Cards */}
+      <AnimatedContent delay={0.05}>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
         {[
-          { label: "Total Recebido", value: totals.income, icon: TrendingUp, color: "text-emerald-600", bg: "bg-emerald-50" },
-          { label: "Total Gasto", value: totals.expense, icon: TrendingDown, color: "text-red-500", bg: "bg-red-50" },
-          { label: "Saldo Acumulado", value: totals.balance, icon: Wallet, color: totals.balance >= 0 ? "text-emerald-600" : "text-red-500", bg: totals.balance >= 0 ? "bg-emerald-50" : "bg-red-50" },
-          { label: "Saldo Médio/Mês", value: totals.avgBalance, icon: BarChart3, color: totals.avgBalance >= 0 ? "text-primary" : "text-red-500", bg: totals.avgBalance >= 0 ? "bg-primary/10" : "bg-red-50" },
+          { label: "Total Recebido", value: totals.income, icon: TrendingUp, color: "text-emerald-600", bg: "bg-emerald-50", spotlightColor: "rgba(16,185,129,0.08)" },
+          { label: "Total Gasto", value: totals.expense, icon: TrendingDown, color: "text-red-500", bg: "bg-red-50", spotlightColor: "rgba(239,68,68,0.08)" },
+          { label: "Saldo Acumulado", value: totals.balance, icon: Wallet, color: totals.balance >= 0 ? "text-emerald-600" : "text-red-500", bg: totals.balance >= 0 ? "bg-emerald-50" : "bg-red-50", spotlightColor: totals.balance >= 0 ? "rgba(16,185,129,0.08)" : "rgba(239,68,68,0.08)" },
+          { label: "Saldo Médio/Mês", value: totals.avgBalance, icon: BarChart3, color: totals.avgBalance >= 0 ? "text-primary" : "text-red-500", bg: totals.avgBalance >= 0 ? "bg-primary/10" : "bg-red-50", spotlightColor: "rgba(99,102,241,0.08)" },
         ].map((card) => (
-          <div key={card.label} className="card-premium p-5">
+          <SpotlightCard key={card.label} className="p-5" spotlightColor={card.spotlightColor}>
             <div className={`w-9 h-9 rounded-xl ${card.bg} flex items-center justify-center mb-3`}>
               <card.icon className={`w-4 h-4 ${card.color}`} />
             </div>
             <p className="text-xs text-muted-foreground font-medium">{card.label}</p>
             <p className={`text-xl font-bold mt-1 tabular-nums ${card.color}`}>
-              {isLoading ? "..." : formatCurrency(card.value)}
+              {isLoading ? "..." : <CurrencyCountUp value={card.value} />}
             </p>
-          </div>
+          </SpotlightCard>
         ))}
       </div>
+      </AnimatedContent>
 
       {/* Bar Chart - Receitas vs Despesas */}
+      <AnimatedContent delay={0.1}>
       <div className="card-premium p-5 lg:p-6">
         <h2 className="text-sm font-semibold text-foreground mb-1">Receitas vs Despesas</h2>
         <p className="text-xs text-muted-foreground mb-4">{MONTHS_LABEL}</p>
@@ -268,8 +274,10 @@ export default function Relatorios() {
           </ResponsiveContainer>
         )}
       </div>
+      </AnimatedContent>
 
       {/* Line Chart + Pie Chart */}
+      <AnimatedContent delay={0.15}>
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div className="card-premium p-5 lg:p-6">
           <h2 className="text-sm font-semibold text-foreground mb-1">Evolução do Saldo</h2>
@@ -334,8 +342,10 @@ export default function Relatorios() {
           )}
         </div>
       </div>
+      </AnimatedContent>
 
       {/* Monthly Detail Table */}
+      <AnimatedContent delay={0.2}>
       <div className="card-premium overflow-hidden">
         <div className="px-5 py-4 border-b border-border flex items-center justify-between">
           <h2 className="text-sm font-semibold text-foreground">Detalhamento Mensal</h2>
@@ -355,12 +365,12 @@ export default function Relatorios() {
             <tbody className="divide-y divide-border">
               {evolutionWithData.length === 0 ? (
                 <tr><td colSpan={5} className="px-6 py-8 text-center text-sm text-muted-foreground">Nenhum dado encontrado nos últimos 6 meses</td></tr>
-              ) : evolutionWithData.map((e) => {
+              ) : evolutionWithData.map((e, idx) => {
                 const isPos = e.balance >= 0;
                 const totalReceitas = e.totalIncome + e.totalRecurringIncome;
                 const totalDespesas = e.totalDespesasReal ?? 0;
                 return (
-                  <tr key={e.month} className="hover:bg-muted/20 transition-colors">
+                  <tr key={e.month} className="hover:bg-muted/20 transition-colors" style={{ animation: "row-in 0.3s ease forwards", animationDelay: `${idx * 0.06}s`, opacity: 0 }}>
                     <td className="px-6 py-3 text-sm font-medium text-foreground">{monthLabel(e.month)} {e.month.split("-")[0]}</td>
                     <td className="px-4 py-3 text-right text-sm font-semibold text-emerald-600">{formatCurrency(totalReceitas)}</td>
                     <td className="px-4 py-3 text-right text-sm text-red-500">{formatCurrency(totalDespesas)}</td>
@@ -375,6 +385,7 @@ export default function Relatorios() {
           </table>
         </div>
       </div>
+      </AnimatedContent>
 
       {/* Export hint */}
       <div className="flex items-center gap-3 bg-indigo-50 border border-indigo-100 rounded-xl px-5 py-3">

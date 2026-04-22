@@ -17,6 +17,9 @@ import {
   MoreHorizontal,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { AnimatedContent } from "@/components/ui/animated-content";
+import { CurrencyCountUp } from "@/components/ui/count-up";
+import { SpotlightCard } from "@/components/ui/spotlight-card";
 import {
   Dialog,
   DialogContent,
@@ -239,7 +242,8 @@ export default function Recorrentes() {
         </TabsList>
 
         {/* Summary card */}
-        <div className="mt-4 card-premium p-5 flex items-center gap-4">
+        <AnimatedContent delay={0.05} className="mt-4">
+        <SpotlightCard className="p-5 flex items-center gap-4" spotlightColor={tab === "income" ? "rgba(16,185,129,0.08)" : "rgba(239,68,68,0.08)"}>
           <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${tab === "income" ? "bg-emerald-50" : "bg-red-50"}`}>
             <RefreshCw className={`w-5 h-5 ${tab === "income" ? "text-emerald-600" : "text-red-500"}`} />
           </div>
@@ -247,14 +251,15 @@ export default function Recorrentes() {
             <p className="text-xs text-muted-foreground font-medium">
               Total mensal fixo — {tab === "income" ? "Receitas" : "Despesas"}
             </p>
-            <p className={`text-2xl font-bold mt-0.5 ${tab === "income" ? "text-emerald-600" : "text-red-500"}`}>
-              {formatCurrency(totalMonthly)}
+            <p className={`text-2xl font-bold mt-0.5 tabular-nums ${tab === "income" ? "text-emerald-600" : "text-red-500"}`}>
+              <CurrencyCountUp value={totalMonthly} />
             </p>
           </div>
           <div className="ml-auto text-right">
             <p className="text-xs text-muted-foreground">{items.length} {items.length === 1 ? "item" : "itens"}</p>
           </div>
-        </div>
+        </SpotlightCard>
+        </AnimatedContent>
 
         <TabsContent value="income" className="mt-4">
           <ItemList
@@ -493,13 +498,13 @@ function ItemList({
   return (
     <div className="card-premium overflow-hidden">
       <div className="divide-y divide-border">
-        {items.map((item) => {
+        {items.map((item, idx) => {
           const cat = item.categoryId ? catMap.get(item.categoryId) : null;
           const amount = parseFloat(item.amount as unknown as string);
           const isIncome = type === "income";
 
           return (
-            <div key={item.id} className="flex items-center gap-4 px-5 py-4 hover:bg-muted/20 transition-colors">
+            <div key={item.id} className="flex items-center gap-4 px-5 py-4 hover:bg-muted/20 transition-colors" style={{ animation: "row-in 0.3s ease forwards", animationDelay: `${idx * 0.04}s`, opacity: 0 }}>
               {/* Category color dot */}
               <div
                 className="w-2.5 h-2.5 rounded-full flex-shrink-0"

@@ -2,6 +2,9 @@ import { useState, useMemo } from "react";
 import { trpc } from "@/lib/trpc";
 import { formatCurrency, formatDate } from "@/lib/format";
 import { Button } from "@/components/ui/button";
+import { AnimatedContent } from "@/components/ui/animated-content";
+import { CurrencyCountUp } from "@/components/ui/count-up";
+import { SpotlightCard } from "@/components/ui/spotlight-card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -197,8 +200,9 @@ export default function Parcelamentos() {
       </div>
 
       {/* Summary */}
+      <AnimatedContent delay={0.05}>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-        <div className="card-premium p-5 flex items-center gap-4">
+        <SpotlightCard className="p-5 flex items-center gap-4" spotlightColor="rgba(245,158,11,0.08)">
           <div className="w-12 h-12 rounded-xl bg-amber-50 flex items-center justify-center">
             <ShoppingCart className="w-6 h-6 text-amber-600" />
           </div>
@@ -206,28 +210,31 @@ export default function Parcelamentos() {
             <p className="text-sm text-muted-foreground">Parcelamentos Ativos</p>
             <p className="text-2xl font-bold text-foreground">{installments.length}</p>
           </div>
-        </div>
-        <div className="card-premium p-5 flex items-center gap-4">
+        </SpotlightCard>
+        <SpotlightCard className="p-5 flex items-center gap-4" spotlightColor="rgba(99,102,241,0.08)">
           <div className="w-12 h-12 rounded-xl bg-indigo-50 flex items-center justify-center">
             <Layers className="w-6 h-6 text-indigo-600" />
           </div>
           <div>
             <p className="text-sm text-muted-foreground">Parcela Mensal Total</p>
-            <p className="text-2xl font-bold text-indigo-600">{formatCurrency(totalActive)}</p>
+            <p className="text-2xl font-bold text-indigo-600 tabular-nums">
+              <CurrencyCountUp value={totalActive} />
+            </p>
           </div>
-        </div>
-        <div className="card-premium p-5 flex items-center gap-4">
+        </SpotlightCard>
+        <SpotlightCard className="p-5 flex items-center gap-4" spotlightColor="rgba(139,92,246,0.08)">
           <div className="w-12 h-12 rounded-xl bg-purple-50 flex items-center justify-center">
             <Calendar className="w-6 h-6 text-purple-600" />
           </div>
           <div>
             <p className="text-sm text-muted-foreground">Total Parcelado</p>
-            <p className="text-2xl font-bold text-purple-600">
-              {formatCurrency(installments.reduce((s, i) => s + parseFloat(String(i.totalAmount)), 0))}
+            <p className="text-2xl font-bold text-purple-600 tabular-nums">
+              <CurrencyCountUp value={installments.reduce((s, i) => s + parseFloat(String(i.totalAmount)), 0)} />
             </p>
           </div>
-        </div>
+        </SpotlightCard>
       </div>
+      </AnimatedContent>
 
       {/* List */}
       {isLoading ? (
@@ -243,8 +250,9 @@ export default function Parcelamentos() {
           </Button>
         </div>
       ) : (
+        <AnimatedContent delay={0.1}>
         <div className="space-y-3">
-          {installments.map((purchase) => {
+          {installments.map((purchase, idx) => {
             const card = getCardById(purchase.creditCardId);
             const category = getCategoryById(purchase.categoryId);
             const progress = getInstallmentProgress(purchase);
@@ -252,7 +260,7 @@ export default function Parcelamentos() {
             const remaining = purchase.installmentCount - progress.paid;
 
             return (
-              <div key={purchase.id} className="card-premium p-5 group">
+              <div key={purchase.id} className="card-premium p-5 group" style={{ animation: "row-in 0.3s ease forwards", animationDelay: `${idx * 0.06}s`, opacity: 0 }}>
                 <div className="flex items-start justify-between gap-4">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
@@ -321,6 +329,7 @@ export default function Parcelamentos() {
             );
           })}
         </div>
+        </AnimatedContent>
       )}
 
       {/* Create Dialog */}
