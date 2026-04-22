@@ -1,16 +1,18 @@
-import { useRef, useState } from "react";
+import { useRef, useState, type ComponentPropsWithoutRef } from "react";
 import { cn } from "@/lib/utils";
 
-interface SpotlightCardProps {
-  children: React.ReactNode;
-  className?: string;
+type SpotlightCardProps = ComponentPropsWithoutRef<"div"> & {
   spotlightColor?: string;
-}
+};
 
 export function SpotlightCard({
   children,
   className,
   spotlightColor = "rgba(99, 102, 241, 0.07)",
+  onMouseMove,
+  onMouseEnter,
+  onMouseLeave,
+  ...props
 }: SpotlightCardProps) {
   const ref = useRef<HTMLDivElement>(null);
   const [pos, setPos] = useState({ x: 0, y: 0 });
@@ -21,6 +23,7 @@ export function SpotlightCard({
     if (!el) return;
     const rect = el.getBoundingClientRect();
     setPos({ x: e.clientX - rect.left, y: e.clientY - rect.top });
+    onMouseMove?.(e);
   };
 
   return (
@@ -28,8 +31,15 @@ export function SpotlightCard({
       ref={ref}
       className={cn("card-premium relative overflow-hidden", className)}
       onMouseMove={handleMouseMove}
-      onMouseEnter={() => setActive(true)}
-      onMouseLeave={() => setActive(false)}
+      onMouseEnter={(e) => {
+        setActive(true);
+        onMouseEnter?.(e);
+      }}
+      onMouseLeave={(e) => {
+        setActive(false);
+        onMouseLeave?.(e);
+      }}
+      {...props}
     >
       <div
         className="pointer-events-none absolute inset-0 z-10 transition-opacity duration-300"
