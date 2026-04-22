@@ -114,6 +114,29 @@ export default function Dashboard() {
   const isPositive = balance >= 0;
 
   const totalReceitas = (summary?.totalIncome ?? 0) + (summary?.totalRecurringIncome ?? 0);
+  const totalReceitasAvulsas = summary?.totalIncome ?? 0;
+  const totalReceitasRecorrentes = summary?.totalRecurringIncome ?? 0;
+
+  const receitasBreakdown = [
+    {
+      label: "Entradas do mês",
+      sub: "Receitas lançadas manualmente",
+      value: totalReceitasAvulsas,
+      icon: Wallet,
+      color: "text-emerald-600",
+      bg: "bg-emerald-50",
+      path: "/receitas",
+    },
+    {
+      label: "Receitas recorrentes",
+      sub: "Entradas fixas e previsíveis",
+      value: totalReceitasRecorrentes,
+      icon: RefreshCw,
+      color: "text-teal-600",
+      bg: "bg-teal-50",
+      path: "/recorrentes",
+    },
+  ];
   const totalDespesasReal = summary?.totalDespesasReal ?? 0;
   const totalPaid = summary?.totalPaid ?? 0;
   const totalPending = summary?.totalPending ?? 0;
@@ -403,6 +426,40 @@ export default function Dashboard() {
       <AnimatedContent delay={0.1}>
       <DueAlertsCard dueAlerts={dueAlerts} />
       </AnimatedContent>
+
+      {/* Receitas por origem */}
+      <div className="card-premium overflow-hidden">
+        <div className="flex items-center gap-2 px-5 py-3.5 border-b border-border">
+          <TrendingUp className="w-3.5 h-3.5 text-emerald-600" />
+          <h2 className="text-sm font-semibold text-foreground">Receitas por Origem</h2>
+        </div>
+        <div className="p-4 space-y-2">
+          {receitasBreakdown.map((item) => (
+            <div
+              key={item.label}
+              className="flex items-start justify-between py-2.5 px-3 rounded-xl hover:bg-muted/40 cursor-pointer transition-colors"
+              onClick={() => setLocation(item.path)}
+            >
+              <div className="flex items-start gap-2.5">
+                <div className={`w-8 h-8 rounded-lg ${item.bg} flex items-center justify-center mt-0.5 flex-shrink-0`}>
+                  <item.icon className={`w-4 h-4 ${item.color}`} />
+                </div>
+                <div>
+                  <span className="text-sm font-medium text-foreground block">{item.label}</span>
+                  <span className="text-[11px] text-muted-foreground">{item.sub}</span>
+                </div>
+              </div>
+              <span className={`text-sm font-semibold ${item.color} flex-shrink-0 ml-2`}>
+                {formatCurrency(item.value)}
+              </span>
+            </div>
+          ))}
+          <div className="flex items-center justify-between pt-2.5 border-t border-border px-3">
+            <span className="text-sm font-semibold text-foreground">Total</span>
+            <span className="text-sm font-bold text-emerald-600">{formatCurrency(totalReceitas)}</span>
+          </div>
+        </div>
+      </div>
 
       {/* Despesas breakdown (expandable) */}
       {despesasExpanded && (
