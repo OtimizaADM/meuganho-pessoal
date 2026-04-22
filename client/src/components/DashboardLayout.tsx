@@ -47,6 +47,8 @@ import { BlurText } from "./ui/blur-text";
 import { ShinyText } from "./ui/shiny-text";
 import { Threads } from "./ui/threads";
 
+const THREADS_GREEN = "#22C55E";
+
 // ─── Auth Feature (left side) ────────────────────────────────────────────────
 
 function AuthFeature({
@@ -88,10 +90,13 @@ function SubmitButton({
       ref={ref}
       type="submit"
       disabled={loading}
-      className="w-full h-14 bg-foreground text-background rounded-xl text-[15px] font-semibold
+      className="w-full h-14 bg-foreground text-[15px] font-semibold rounded-xl
                  transition-all duration-150 ease-out hover:opacity-90 active:scale-[0.99]
                  disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-      style={{ transform: `translate(${xy.x}px, ${xy.y}px)` }}
+      style={{
+        transform: `translate(${xy.x}px, ${xy.y}px)`,
+        color: THREADS_GREEN,
+      }}
       onMouseMove={(e) => {
         const el = ref.current;
         if (!el) return;
@@ -203,7 +208,7 @@ function AuthScreen({ onSuccess }: { onSuccess: () => void }) {
           <h1 className="text-[52px] xl:text-[60px] leading-[1.02] font-bold tracking-tighter text-white">
             Suas finanças.
             <br />
-            <span className="text-white/45">Sob controle.</span>
+            <span style={{ color: THREADS_GREEN }}>Sob controle.</span>
           </h1>
           <p className="mt-5 text-[14px] text-white/55 leading-relaxed max-w-xs">
             Acompanhe receitas, despesas, cartões e metas em um único lugar — com a clareza de um banco premium.
@@ -226,7 +231,7 @@ function AuthScreen({ onSuccess }: { onSuccess: () => void }) {
           <h1 className="text-3xl font-bold tracking-tight leading-tight text-white">
             Suas finanças.
             <br />
-            <span className="text-white/45">Sob controle.</span>
+            <span style={{ color: THREADS_GREEN }}>Sob controle.</span>
           </h1>
         </div>
 
@@ -254,7 +259,8 @@ function AuthScreen({ onSuccess }: { onSuccess: () => void }) {
                 Novo aqui?{" "}
                 <button
                   onClick={() => switchMode("register")}
-                  className="font-semibold text-foreground hover:underline underline-offset-2 transition-colors"
+                  className="font-semibold hover:underline underline-offset-2 transition-colors"
+                  style={{ color: THREADS_GREEN }}
                 >
                   Criar conta
                 </button>
@@ -264,7 +270,8 @@ function AuthScreen({ onSuccess }: { onSuccess: () => void }) {
                 Já tem conta?{" "}
                 <button
                   onClick={() => switchMode("login")}
-                  className="font-semibold text-foreground hover:underline underline-offset-2 transition-colors"
+                  className="font-semibold hover:underline underline-offset-2 transition-colors"
+                  style={{ color: THREADS_GREEN }}
                 >
                   Entrar
                 </button>
@@ -279,8 +286,13 @@ function AuthScreen({ onSuccess }: { onSuccess: () => void }) {
 
             {/* Heading — BlurText reanimates on mode change */}
             <div className="mb-8">
-              <h2 className="text-[40px] lg:text-[48px] font-bold tracking-tighter text-foreground leading-[1.05]">
-                <BlurText key={mode} text={mode === "login" ? "Bem-vindo de volta." : "Crie sua conta."} delay={0.06} />
+              <h2 className="text-[40px] lg:text-[48px] font-bold tracking-tighter leading-[1.05]" style={{ color: THREADS_GREEN }}>
+                <BlurText
+                  key={mode}
+                  text={mode === "login" ? "Bem-vindo de volta." : "Crie sua conta."}
+                  delay={0.06}
+                  className="text-inherit"
+                />
               </h2>
               <p className="mt-3 text-[14px] text-muted-foreground leading-relaxed">
                 {mode === "login"
