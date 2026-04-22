@@ -513,6 +513,48 @@ export default function Dashboard() {
         </div>
       )}
 
+      {/* Despesas por forma de pagamento */}
+      <div className="card-premium overflow-hidden">
+        <div className="flex items-center gap-2 px-5 py-3.5 border-b border-border">
+          <TrendingDown className="w-3.5 h-3.5 text-red-500" />
+          <h2 className="text-sm font-semibold text-foreground">Despesas por Forma de Pagamento</h2>
+        </div>
+        <div className="p-4 space-y-2">
+          {despesasBreakdown.map((item) => (
+            <div
+              key={item.label}
+              className="flex items-start justify-between py-2.5 px-3 rounded-xl hover:bg-muted/40 cursor-pointer transition-colors"
+              onClick={() => setLocation(item.path)}
+            >
+              <div className="flex items-start gap-2.5">
+                <div className={`w-8 h-8 rounded-lg ${item.bg} flex items-center justify-center mt-0.5 flex-shrink-0`}>
+                  <item.icon className={`w-4 h-4 ${item.color}`} />
+                </div>
+                <div>
+                  <span className="text-sm font-medium text-foreground block">{item.label}</span>
+                  <span className="text-[11px] text-muted-foreground">{item.sub}</span>
+                </div>
+              </div>
+              <span className={`text-sm font-semibold ${item.color} flex-shrink-0 ml-2`}>
+                {formatCurrency(item.value)}
+              </span>
+            </div>
+          ))}
+          <div className="flex items-center justify-between pt-2.5 border-t border-border px-3">
+            <span className="text-sm font-semibold text-foreground">Total</span>
+            <span className="text-sm font-bold text-red-500">{formatCurrency(totalDespesasReal)}</span>
+          </div>
+          <div className="flex items-center gap-2 px-3 pt-1">
+            <span className="text-[11px] text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-full font-medium">
+              {formatCurrency(totalPaid)} pago
+            </span>
+            <span className="text-[11px] text-red-500 bg-red-50 px-2 py-0.5 rounded-full font-medium">
+              {formatCurrency(totalPending)} pendente
+            </span>
+          </div>
+        </div>
+      </div>
+
       {/* Distribuição de Despesas por Categoria */}
       <AnimatedContent delay={0.05}>
       <div className="card-premium overflow-hidden">
