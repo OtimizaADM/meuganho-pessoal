@@ -22,10 +22,13 @@ import {
   Banknote,
   Eye,
   EyeOff,
+  PiggyBank,
+  Flame,
 } from "lucide-react";
 import {
   AreaChart,
   Area,
+  Line,
   XAxis,
   YAxis,
   CartesianGrid,
@@ -36,9 +39,11 @@ import {
   Cell,
 } from "recharts";
 import { Button } from "@/components/ui/button";
+import { Progress } from "@/components/ui/progress";
 import { AnimatedContent } from "@/components/ui/animated-content";
 import { CurrencyCountUp } from "@/components/ui/count-up";
 import { GlareHover } from "@/components/ui/glare-hover";
+import { SpotlightCard } from "@/components/ui/spotlight-card";
 import DueAlertsCard from "@/components/dashboard/DueAlertsCard";
 
 function getNextMonth(month: string): string {
@@ -112,6 +117,48 @@ export default function Dashboard() {
   const totalDespesasReal = summary?.totalDespesasReal ?? 0;
   const totalPaid = summary?.totalPaid ?? 0;
   const totalPending = summary?.totalPending ?? 0;
+
+  // ── Insight 1 + 2: Taxa de Poupança + Comparação mês anterior ────────────
+  const prevMonthStr = useMemo(() => {
+    const [y, m] = month.split("-").map(Number);
+    return m === 1 ? `${y - 1}-12` : `${y}-${String(m - 1).padStart(2, "0")}`;
+  }, [month]);
+
+  const prevEvolution = useMemo(
+    () => evolution.find((e) => e.month === prevMonthStr) ?? null,
+    [evolution, prevMonthStr]
+  );
+
+  const prevReceitas = prevEvolution
+    ? (prevEvolution.totalIncome ?? 0) + (prevEvolution.totalRecurringIncome ?? 0)
+    : null;
+  const prevDespesas = prevEvolution ? (prevEvolution.totalDespesasReal ?? 0) : null;
+
+  const savingsRate = totalReceitas > 0 ? (balance / totalReceitas) * 100 : 0;
+  const savingsLabel =
+    savingsRate >= 30 ? "Excelente" : savingsRate >= 20 ? "Bom" : savingsRate >= 10 ? "Atenção" : "Crítico";
+  const savingsColor =
+    savingsRate >= 20 ? "text-emerald-600" : savingsRate >= 10 ? "text-amber-500" : "text-red-500";
+  const savingsSpotlight =
+    savingsRate >= 20 ? "rgba(16,185,129,0.09)" : savingsRate >= 10 ? "rgba(245,158,11,0.09)" : "rgba(239,68,68,0.09)";
+  const savingsBadgeCls =
+    savingsRate >= 20
+      ? "bg-emerald-50 text-emerald-700"
+      : savingsRate >= 10
+      ? "bg-amber-50 text-amber-700"
+      : "bg-red-50 text-red-600";
+
+  // ── Insight 3: Burn Rate ──────────────────────────────────────────────────
+  const burnRate = useMemo(() => {
+    if (month !== getCurrentMonth()) return null;
+    const now = new Date();
+    const daysInMonth = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+    const dayOfMonth = now.getDate();
+    const monthPct = (dayOfMonth / daysInMonth) * 100;
+    const spendingPct = totalReceitas > 0 ? (totalDespesasReal / totalReceitas) * 100 : 0;
+    const isAccelerated = spendingPct > monthPct + 10;
+    return { dayOfMonth, daysInMonth, monthPct, spendingPct, isAccelerated };
+  }, [month, totalDespesasReal, totalReceitas]);
 
   const totalVista = summary?.totalVista ?? 0;
   const totalCreditCard = summary?.totalCreditCard ?? 0;
@@ -220,10 +267,16 @@ export default function Dashboard() {
                 <p className="text-base font-bold text-white mt-1.5 tabular-nums">
                   {summaryLoading ? "..." : <CurrencyCountUp value={totalReceitas} />}
                 </p>
-                <div className="flex items-center gap-1 mt-1">
-                  <TrendingUp className="w-3 h-3 text-emerald-400" />
-                  <span className="text-[11px] text-emerald-400">Entradas</span>
-                </div>
+                {prevReceitas !== null && !summaryLoading && (
+                  <div className="flex items-center gap-0.5 mt-1">
+                    {totalReceitas >= prevReceitas
+                      ? <ChevronUp className="w-3 h-3 text-emerald-400 flex-shrink-0" />
+                      : <ChevronDown className="w-3 h-3 text-red-400 flex-shrink-0" />}
+                    <span className={`text-[10px] ${totalReceitas >= prevReceitas ? "text-emerald-400" : "text-red-400"}`}>
+                      {formatCurrency(Math.abs(totalReceitas - prevReceitas))} vs anterior
+                    </span>
+                  </div>
+                )}
               </div>
             </GlareHover>
 
@@ -240,14 +293,109 @@ export default function Dashboard() {
                 <p className="text-base font-bold text-white mt-1.5 tabular-nums">
                   {summaryLoading ? "..." : <CurrencyCountUp value={totalDespesasReal} />}
                 </p>
-                <div className="flex items-center gap-1 mt-1">
-                  <TrendingDown className="w-3 h-3 text-red-400" />
-                  <span className="text-[11px] text-red-400">Saídas</span>
-                </div>
+                {prevDespesas !== null && !summaryLoading && (
+                  <div className="flex items-center gap-0.5 mt-1">
+                    {totalDespesasReal <= prevDespesas
+                      ? <ChevronDown className="w-3 h-3 text-emerald-400 flex-shrink-0" />
+                      : <ChevronUp className="w-3 h-3 text-red-400 flex-shrink-0" />}
+                    <span className={`text-[10px] ${totalDespesasReal <= prevDespesas ? "text-emerald-400" : "text-red-400"}`}>
+                      {formatCurrency(Math.abs(totalDespesasReal - prevDespesas))} vs anterior
+                    </span>
+                  </div>
+                )}
               </div>
             </GlareHover>
           </div>
         </div>
+      </div>
+      </AnimatedContent>
+
+      {/* Insights: Taxa de Poupança + Ritmo de Gastos */}
+      <AnimatedContent delay={0.08}>
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        {/* Taxa de Poupança */}
+        <SpotlightCard className="p-5" spotlightColor={savingsSpotlight}>
+          <div className="flex items-start justify-between mb-3">
+            <div className="flex items-center gap-2.5">
+              <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${savingsRate >= 20 ? "bg-emerald-50" : savingsRate >= 10 ? "bg-amber-50" : "bg-red-50"}`}>
+                <PiggyBank className={`w-4 h-4 ${savingsColor}`} />
+              </div>
+              <div>
+                <p className="text-xs font-semibold text-foreground">Taxa de Poupança</p>
+                <p className="text-[11px] text-muted-foreground">do que você ganha, sobra</p>
+              </div>
+            </div>
+            <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${savingsBadgeCls}`}>
+              {savingsLabel}
+            </span>
+          </div>
+          <div className="flex items-end gap-2 mb-2">
+            <span className={`text-3xl font-bold tabular-nums ${savingsColor}`}>
+              {summaryLoading ? "—" : `${Math.abs(savingsRate).toFixed(1)}%`}
+            </span>
+            <span className="text-xs text-muted-foreground mb-1">
+              {totalReceitas > 0 ? `${formatCurrency(Math.abs(balance))} de ${formatCurrency(totalReceitas)}` : "sem receitas"}
+            </span>
+          </div>
+          <Progress
+            value={Math.min(Math.max(savingsRate, 0), 100)}
+            className={`h-1.5 ${savingsRate >= 20 ? "[&>div]:bg-emerald-500" : savingsRate >= 10 ? "[&>div]:bg-amber-500" : "[&>div]:bg-red-500"}`}
+          />
+        </SpotlightCard>
+
+        {/* Ritmo de Gastos (burn rate) — só para mês atual */}
+        {burnRate ? (
+          <SpotlightCard
+            className="p-5"
+            spotlightColor={burnRate.isAccelerated ? "rgba(239,68,68,0.08)" : "rgba(99,102,241,0.07)"}
+          >
+            <div className="flex items-start justify-between mb-3">
+              <div className="flex items-center gap-2.5">
+                <div className={`w-9 h-9 rounded-xl flex items-center justify-center ${burnRate.isAccelerated ? "bg-red-50" : "bg-indigo-50"}`}>
+                  <Flame className={`w-4 h-4 ${burnRate.isAccelerated ? "text-red-500" : "text-indigo-500"}`} />
+                </div>
+                <div>
+                  <p className="text-xs font-semibold text-foreground">Ritmo de Gastos</p>
+                  <p className="text-[11px] text-muted-foreground">dia {burnRate.dayOfMonth} de {burnRate.daysInMonth}</p>
+                </div>
+              </div>
+              <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full ${burnRate.isAccelerated ? "bg-red-50 text-red-600" : "bg-emerald-50 text-emerald-700"}`}>
+                {burnRate.isAccelerated ? "Acelerado" : "Saudável"}
+              </span>
+            </div>
+            <div className="space-y-2.5">
+              <div>
+                <div className="flex justify-between text-[11px] text-muted-foreground mb-1">
+                  <span>Mês decorrido</span>
+                  <span className="font-medium text-foreground">{burnRate.monthPct.toFixed(0)}%</span>
+                </div>
+                <Progress value={burnRate.monthPct} className="h-1.5 [&>div]:bg-slate-400" />
+              </div>
+              <div>
+                <div className="flex justify-between text-[11px] text-muted-foreground mb-1">
+                  <span>Renda já gasta</span>
+                  <span className={`font-medium ${burnRate.isAccelerated ? "text-red-500" : "text-foreground"}`}>
+                    {burnRate.spendingPct.toFixed(0)}%
+                  </span>
+                </div>
+                <Progress
+                  value={Math.min(burnRate.spendingPct, 100)}
+                  className={`h-1.5 ${burnRate.isAccelerated ? "[&>div]:bg-red-500" : "[&>div]:bg-indigo-500"}`}
+                />
+              </div>
+            </div>
+          </SpotlightCard>
+        ) : (
+          <SpotlightCard className="p-5 flex items-center gap-3" spotlightColor="rgba(99,102,241,0.07)">
+            <div className="w-9 h-9 rounded-xl bg-indigo-50 flex items-center justify-center flex-shrink-0">
+              <Flame className="w-4 h-4 text-indigo-500" />
+            </div>
+            <div>
+              <p className="text-xs font-semibold text-foreground">Ritmo de Gastos</p>
+              <p className="text-[11px] text-muted-foreground">Disponível apenas para o mês atual</p>
+            </div>
+          </SpotlightCard>
+        )}
       </div>
       </AnimatedContent>
 
@@ -550,11 +698,12 @@ export default function Dashboard() {
                 <XAxis dataKey="month" tick={{ fontSize: 11, fill: "#94a3b8" }} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fontSize: 11, fill: "#94a3b8" }} axisLine={false} tickLine={false} tickFormatter={(v) => `R$${(v / 1000).toFixed(0)}k`} />
                 <Tooltip
-                  formatter={(value: number) => formatCurrency(value)}
+                  formatter={(value: number, name: string) => [formatCurrency(value), name]}
                   contentStyle={{ borderRadius: "12px", border: "1px solid #e2e8f0", fontSize: "12px", boxShadow: "0 4px 12px rgba(0,0,0,0.08)" }}
                 />
                 <Area type="monotone" dataKey="Receitas" stroke="#22c55e" strokeWidth={2} fill="url(#colorReceitas)" />
                 <Area type="monotone" dataKey="Despesas" stroke="#ef4444" strokeWidth={2} fill="url(#colorDespesas)" />
+                <Line type="monotone" dataKey="Saldo" stroke="#6366f1" strokeWidth={2} dot={{ fill: "#6366f1", r: 3 }} activeDot={{ r: 5 }} strokeDasharray="5 3" />
               </AreaChart>
             </ResponsiveContainer>
           )}
