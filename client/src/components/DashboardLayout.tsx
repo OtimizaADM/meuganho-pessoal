@@ -34,7 +34,6 @@ import {
   CreditCard,
   ShoppingCart,
   BarChart3,
-  Wallet,
   RefreshCw,
   Target,
   Check,
@@ -46,6 +45,7 @@ import { DashboardLayoutSkeleton } from "./DashboardLayoutSkeleton";
 import { BlurText } from "./ui/blur-text";
 import { ShinyText } from "./ui/shiny-text";
 import { Threads } from "./ui/threads";
+import { Logo, GBubbleIcon } from "./Logo";
 
 const THREADS_GREEN = "#22C55E";
 
@@ -197,7 +197,7 @@ function AuthScreen({ onSuccess }: { onSuccess: () => void }) {
 
         {/* Logo */}
         <div className="relative">
-          <img src="/logo-white.svg" alt="Meu Ganho" className="h-14 w-auto shrink-0 drop-shadow-[0_10px_24px_rgba(0,0,0,0.35)]" />
+          <Logo variant="white" size="lg" />
         </div>
 
         {/* Desktop: headline + features */}
@@ -244,10 +244,15 @@ function AuthScreen({ onSuccess }: { onSuccess: () => void }) {
         {/* Top nav: mode toggle */}
         <div className="flex items-center justify-between px-8 py-6">
           {/* Mobile logo */}
+<<<<<<< HEAD
           <div className="flex items-center gap-2 lg:hidden">
             <div className="rounded-xl bg-card px-2 py-1 shadow-sm ring-1 ring-border/60">
               <img src="/logo.svg" alt="Meu Ganho" className="h-8 w-auto" />
             </div>
+=======
+          <div className="lg:hidden">
+            <Logo variant="dark" size="sm" />
+>>>>>>> 25f2511 (feat(brand): logo real do Meu Ganho em todo o sistema)
           </div>
           <div className="hidden lg:block" />
 
@@ -502,11 +507,11 @@ function DashboardLayoutContent({
               >
                 <PanelLeft className="h-4 w-4 text-sidebar-muted-foreground" />
               </button>
-              {!isCollapsed && (
+              {isCollapsed ? (
+                <GBubbleIcon className="w-5 h-6 shrink-0" />
+              ) : (
                 <div className="flex items-center gap-2 min-w-0">
-                  <div className="w-6 h-6 rounded-md bg-sidebar-primary flex items-center justify-center shrink-0">
-                    <Wallet className="w-3.5 h-3.5 text-sidebar-primary-foreground" />
-                  </div>
+                  <GBubbleIcon className="w-5 h-6 shrink-0" />
                   <ShinyText
                     text="Meu Ganho Pessoal"
                     className="font-semibold text-sm tracking-tight truncate"

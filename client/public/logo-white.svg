@@ -1,14 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 230 140" fill="none" role="img" aria-labelledby="title desc">
-  <title id="title">Logo Meu Ganho branco</title>
-  <desc id="desc">Wordmark da marca Meu Ganho em branco, com G em verde.</desc>
-
-  <text x="10" y="55" font-family="Inter, Poppins, Montserrat, Arial, sans-serif" font-size="72" font-weight="800" letter-spacing="-2" fill="#FFFFFF">
-    meu
-  </text>
-  <text x="10" y="122" font-family="Inter, Poppins, Montserrat, Arial, sans-serif" font-size="80" font-weight="800" letter-spacing="-2" fill="#FFFFFF">
-    Ganho
-  </text>
-  <text x="10" y="122" font-family="Inter, Poppins, Montserrat, Arial, sans-serif" font-size="80" font-weight="800" letter-spacing="-2" fill="#22c55e">
-    G
-  </text>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 36" fill="none">
+  <path d="M6 0H26C29.3 0 32 2.7 32 6V22C32 25.3 29.3 28 26 28H17L3 36L8 28H6C2.7 28 0 25.3 0 22V6C0 2.7 2.7 0 6 0Z" fill="white" fill-opacity="0.9"/>
+  <path d="M21 7H13C10.2 7 8 9.2 8 12V18C8 20.8 10.2 23 13 23H21C23.8 23 26 20.8 26 18V15H18V17H22V21H13V9H26V7H21Z" fill="#22c55e"/>
 </svg>
