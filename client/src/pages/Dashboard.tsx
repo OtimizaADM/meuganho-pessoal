@@ -67,6 +67,7 @@ function daysFromNow(dateStr: string): number {
 export default function Dashboard() {
   const [month, setMonth] = useState(getCurrentMonth);
   const [, setLocation] = useLocation();
+  const [despesasExpanded, setDespesasExpanded] = useState(false);
   const [balanceHidden, setBalanceHidden] = useState(false);
 
   const last6Months = useMemo(() => getLast6Months(), []);
@@ -285,7 +286,7 @@ export default function Dashboard() {
               glareOpacity={0.15}
               glareSize={300}
               style={{ background: "oklch(1 0 0 / 0.07)", border: "1px solid oklch(1 0 0 / 0.12)" }}
-              onClick={() => setLocation("/despesas")}
+              onClick={() => setDespesasExpanded(!despesasExpanded)}
             >
               <div className="p-4 text-left">
                 <p className="text-[10px] text-white/55 uppercase tracking-widest font-medium">Despesas</p>
@@ -403,45 +404,20 @@ export default function Dashboard() {
       <DueAlertsCard dueAlerts={dueAlerts} />
       </AnimatedContent>
 
-      {/* Receitas e Despesas por composição */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      {/* Despesas breakdown (expandable) */}
+      {despesasExpanded && (
         <div className="card-premium overflow-hidden">
-          <div className="flex items-center gap-2 px-5 py-3.5 border-b border-border">
-            <TrendingUp className="w-3.5 h-3.5 text-emerald-600" />
-            <h2 className="text-sm font-semibold text-foreground">Receitas por Origem</h2>
-          </div>
-          <div className="p-4 space-y-2">
-            {receitasBreakdown.map((item) => (
-              <div
-                key={item.label}
-                className="flex items-start justify-between py-2.5 px-3 rounded-xl hover:bg-muted/40 cursor-pointer transition-colors"
-                onClick={() => setLocation(item.path)}
-              >
-                <div className="flex items-start gap-2.5">
-                  <div className={`w-8 h-8 rounded-lg ${item.bg} flex items-center justify-center mt-0.5 flex-shrink-0`}>
-                    <item.icon className={`w-4 h-4 ${item.color}`} />
-                  </div>
-                  <div>
-                    <span className="text-sm font-medium text-foreground block">{item.label}</span>
-                    <span className="text-[11px] text-muted-foreground">{item.sub}</span>
-                  </div>
-                </div>
-                <span className={`text-sm font-semibold ${item.color} flex-shrink-0 ml-2`}>
-                  {formatCurrency(item.value)}
-                </span>
-              </div>
-            ))}
-            <div className="flex items-center justify-between pt-2.5 border-t border-border px-3">
-              <span className="text-sm font-semibold text-foreground">Total</span>
-              <span className="text-sm font-bold text-emerald-600">{formatCurrency(totalReceitas)}</span>
+          <div className="flex items-center justify-between px-5 py-3.5 border-b border-border">
+            <div className="flex items-center gap-2">
+              <TrendingDown className="w-3.5 h-3.5 text-red-500" />
+              <h2 className="text-sm font-semibold text-foreground">Despesas por Forma de Pagamento</h2>
             </div>
-          </div>
-        </div>
-
-        <div className="card-premium overflow-hidden">
-          <div className="flex items-center gap-2 px-5 py-3.5 border-b border-border">
-            <TrendingDown className="w-3.5 h-3.5 text-red-500" />
-            <h2 className="text-sm font-semibold text-foreground">Despesas por Forma de Pagamento</h2>
+            <button
+              onClick={() => setDespesasExpanded(false)}
+              className="text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <ChevronUp className="w-4 h-4" />
+            </button>
           </div>
           <div className="p-4 space-y-2">
             {despesasBreakdown.map((item) => (
@@ -478,7 +454,7 @@ export default function Dashboard() {
             </div>
           </div>
         </div>
-      </div>
+      )}
 
       {/* Distribuição de Despesas por Categoria */}
       <AnimatedContent delay={0.05}>
