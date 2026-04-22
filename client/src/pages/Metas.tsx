@@ -23,6 +23,8 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { AnimatedContent } from "@/components/ui/animated-content";
+import { SpotlightCard } from "@/components/ui/spotlight-card";
 import {
   Dialog,
   DialogContent,
@@ -376,8 +378,9 @@ export default function Metas() {
               onAdd={openCreateMonthly}
             />
           ) : (
+            <AnimatedContent delay={0.05}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {monthlyGoals.map((goal) => {
+              {monthlyGoals.map((goal, idx) => {
                 const limit = parseFloat(goal.limitAmount as unknown as string);
                 const spent = goal.categoryId ? (expenseByCatMap.get(goal.categoryId) ?? 0) : 0;
                 const pct = limit > 0 ? Math.min((spent / limit) * 100, 100) : 0;
@@ -386,11 +389,14 @@ export default function Metas() {
                 const catName = goal.categoryId
                   ? allExpCats.find((c) => c.id === goal.categoryId)?.name
                   : null;
+                const spotlightColor = isOver ? "rgba(239,68,68,0.08)" : isWarning ? "rgba(245,158,11,0.08)" : "rgba(99,102,241,0.07)";
 
                 return (
-                  <div
+                  <SpotlightCard
                     key={goal.id}
-                    className="card-premium p-5 space-y-4"
+                    className="p-5 space-y-4"
+                    spotlightColor={spotlightColor}
+                    style={{ animation: "row-in 0.35s ease forwards", animationDelay: `${idx * 0.07}s`, opacity: 0 } as React.CSSProperties}
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex items-center gap-3">
@@ -464,10 +470,11 @@ export default function Metas() {
                         )}
                       </p>
                     </div>
-                  </div>
+                  </SpotlightCard>
                 );
               })}
             </div>
+            </AnimatedContent>
           )}
         </TabsContent>
 
@@ -495,8 +502,9 @@ export default function Metas() {
           ) : annualGoals.length === 0 ? (
             <EmptyState type="annual" onAdd={openCreateAnnual} />
           ) : (
+            <AnimatedContent delay={0.05}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {annualGoals.map((goal) => {
+              {annualGoals.map((goal, idx) => {
                 const target = parseFloat(goal.targetAmount ?? goal.limitAmount as unknown as string);
                 const current = parseFloat(goal.currentAmount as unknown as string ?? "0");
                 const pct = target > 0 ? Math.min((current / target) * 100, 100) : 0;
@@ -506,7 +514,8 @@ export default function Metas() {
                 return (
                   <div
                     key={goal.id}
-                    className={`bg-white rounded-2xl border p-5 shadow-sm space-y-4 ${isCompleted ? "border-emerald-200 bg-emerald-50/30" : "border-border"}`}
+                    className={`card-premium p-5 space-y-4 ${isCompleted ? "border-emerald-200" : ""}`}
+                    style={{ animation: "row-in 0.35s ease forwards", animationDelay: `${idx * 0.07}s`, opacity: 0 }}
                   >
                     <div className="flex items-start justify-between gap-3">
                       <div className="flex items-center gap-3">
@@ -579,6 +588,7 @@ export default function Metas() {
                 );
               })}
             </div>
+            </AnimatedContent>
           )}
         </TabsContent>
       </Tabs>

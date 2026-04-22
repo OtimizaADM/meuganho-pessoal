@@ -3,6 +3,9 @@ import { trpc } from "@/lib/trpc";
 import { MonthPicker } from "@/components/MonthPicker";
 import { formatCurrency, formatDate, getCurrentMonth } from "@/lib/format";
 import { Button } from "@/components/ui/button";
+import { AnimatedContent } from "@/components/ui/animated-content";
+import { CurrencyCountUp } from "@/components/ui/count-up";
+import { SpotlightCard } from "@/components/ui/spotlight-card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -171,21 +174,26 @@ export default function Receitas() {
       </div>
 
       {/* Summary Card */}
-      <div className="card-premium p-5 flex items-center gap-4">
-        <div className="w-11 h-11 rounded-xl bg-emerald-50 flex items-center justify-center flex-shrink-0">
-          <TrendingUp className="w-5 h-5 text-emerald-600" />
-        </div>
-        <div>
-          <p className="text-xs text-muted-foreground font-medium">Total de Receitas no Mês</p>
-          <p className="text-2xl font-bold text-emerald-600 tabular-nums">{formatCurrency(totalMonth)}</p>
-        </div>
-        <div className="ml-auto text-right">
-          <p className="text-xs text-muted-foreground font-medium">Lançamentos</p>
-          <p className="text-xl font-semibold text-foreground">{incomes.length}</p>
-        </div>
-      </div>
+      <AnimatedContent delay={0.05}>
+        <SpotlightCard className="p-5 flex items-center gap-4" spotlightColor="rgba(16,185,129,0.08)">
+          <div className="w-11 h-11 rounded-xl bg-emerald-50 flex items-center justify-center flex-shrink-0">
+            <TrendingUp className="w-5 h-5 text-emerald-600" />
+          </div>
+          <div>
+            <p className="text-xs text-muted-foreground font-medium">Total de Receitas no Mês</p>
+            <p className="text-2xl font-bold text-emerald-600 tabular-nums">
+              <CurrencyCountUp value={totalMonth} />
+            </p>
+          </div>
+          <div className="ml-auto text-right">
+            <p className="text-xs text-muted-foreground font-medium">Lançamentos</p>
+            <p className="text-xl font-semibold text-foreground">{incomes.length}</p>
+          </div>
+        </SpotlightCard>
+      </AnimatedContent>
 
       {/* Table */}
+      <AnimatedContent delay={0.1}>
       <div className="card-premium overflow-hidden">
         {isLoading ? (
           <div className="flex items-center justify-center h-40 text-muted-foreground text-sm">Carregando...</div>
@@ -209,10 +217,14 @@ export default function Receitas() {
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {incomes.map((income) => {
+              {incomes.map((income, idx) => {
                 const cat = getCategoryInfo(income.categoryId);
                 return (
-                  <tr key={income.id} className="hover:bg-muted/20 transition-colors group">
+                  <tr
+                    key={income.id}
+                    className="hover:bg-muted/20 transition-colors group"
+                    style={{ animation: "row-in 0.3s ease forwards", animationDelay: `${idx * 0.04}s`, opacity: 0 }}
+                  >
                     <td className="px-6 py-4">
                       <div className="flex items-center gap-2">
                         <span className="font-medium text-sm text-foreground">{income.description}</span>
@@ -263,6 +275,8 @@ export default function Receitas() {
           </table>
         )}
       </div>
+
+      </AnimatedContent>
 
       {/* Create/Edit Dialog */}
       <Dialog open={open} onOpenChange={setOpen}>

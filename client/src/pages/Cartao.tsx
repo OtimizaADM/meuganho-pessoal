@@ -1,10 +1,11 @@
 import { useState, useMemo } from "react";
-import DashboardLayout from "@/components/DashboardLayout";
 import { trpc } from "@/lib/trpc";
 import { formatCurrency, formatDate } from "@/lib/format";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { AnimatedContent } from "@/components/ui/animated-content";
+import { CurrencyCountUp } from "@/components/ui/count-up";
+import { SpotlightCard } from "@/components/ui/spotlight-card";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -258,14 +259,13 @@ export default function Cartao() {
   const filteredCards = selectedCardId ? cards.filter((c) => c.id === selectedCardId) : cards;
 
   return (
-    <DashboardLayout>
-      <div className="p-6 space-y-6">
-        {/* Header */}
-        <div className="flex items-center justify-between flex-wrap gap-3">
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">Cartão de Crédito</h1>
-            <p className="text-sm text-muted-foreground">Gerencie seus cartões e faturas</p>
-          </div>
+    <div className="space-y-5">
+      {/* Header */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <h1 className="text-xl font-semibold tracking-tight text-foreground">Cartão de Crédito</h1>
+          <p className="text-xs text-muted-foreground mt-0.5">Gerencie seus cartões e faturas</p>
+        </div>
           <div className="flex items-center gap-2">
             <MonthPicker value={selectedMonth} onChange={setSelectedMonth} />
             <Button onClick={() => setShowNewTransaction(true)} className="gap-2">
@@ -307,25 +307,28 @@ export default function Cartao() {
             </div>
 
             {/* Total da fatura */}
-            <Card className="border-primary/20 bg-primary/5">
-              <CardContent className="flex items-center justify-between p-5">
-                <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center">
-                    <CreditCard className="w-5 h-5 text-primary" />
-                  </div>
-                  <div>
-                    <div className="text-sm text-muted-foreground">Total da Fatura</div>
-                    <div className="text-2xl font-bold text-primary">{formatCurrency(grandTotal)}</div>
-                  </div>
+            <AnimatedContent delay={0.05}>
+            <SpotlightCard className="p-5 flex items-center justify-between" spotlightColor="rgba(99,102,241,0.08)">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0">
+                  <CreditCard className="w-5 h-5 text-primary" />
                 </div>
-                <div className="text-right text-sm text-muted-foreground">
-                  <div className="font-medium text-foreground">{selectedMonth}</div>
-                  <div>{cards.length} cartão{cards.length !== 1 ? "ões" : ""}</div>
+                <div>
+                  <p className="text-xs text-muted-foreground font-medium">Total da Fatura</p>
+                  <p className="text-2xl font-bold text-primary tabular-nums">
+                    <CurrencyCountUp value={grandTotal} />
+                  </p>
                 </div>
-              </CardContent>
-            </Card>
+              </div>
+              <div className="text-right text-sm text-muted-foreground">
+                <div className="font-medium text-foreground">{selectedMonth}</div>
+                <div>{cards.length} cartão{cards.length !== 1 ? "ões" : ""}</div>
+              </div>
+            </SpotlightCard>
+            </AnimatedContent>
 
             {/* 4 Sections */}
+            <AnimatedContent delay={0.1}>
             <div className="space-y-3">
               {/* 1. Assinaturas Fixas */}
               <InvoiceSection
@@ -450,6 +453,7 @@ export default function Cartao() {
                 ))}
               </InvoiceSection>
             </div>
+            </AnimatedContent>
           </TabsContent>
 
           {/* ── Meus Cartões Tab ─────────────────────────────────────────── */}
@@ -489,7 +493,6 @@ export default function Cartao() {
             )}
           </TabsContent>
         </Tabs>
-      </div>
 
       {/* ── Dialog: Novo Lançamento ────────────────────────────────────────── */}
       <Dialog open={showNewTransaction} onOpenChange={setShowNewTransaction}>
@@ -688,6 +691,6 @@ export default function Cartao() {
           </form>
         </DialogContent>
       </Dialog>
-    </DashboardLayout>
+    </div>
   );
 }

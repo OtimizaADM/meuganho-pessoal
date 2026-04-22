@@ -3,6 +3,9 @@ import { trpc } from "@/lib/trpc";
 import { MonthPicker } from "@/components/MonthPicker";
 import { formatCurrency, formatDate, getCurrentMonth } from "@/lib/format";
 import { Button } from "@/components/ui/button";
+import { AnimatedContent } from "@/components/ui/animated-content";
+import { CurrencyCountUp } from "@/components/ui/count-up";
+import { SpotlightCard } from "@/components/ui/spotlight-card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import {
@@ -346,35 +349,42 @@ export default function Despesas() {
       </div>
 
       {/* Summary */}
+      <AnimatedContent delay={0.05}>
       <div className="grid grid-cols-1 sm:grid-cols-4 gap-3">
-        <div className="card-premium p-5 flex items-center gap-3 sm:col-span-1">
+        <SpotlightCard className="p-5 flex items-center gap-3 sm:col-span-1" spotlightColor="rgba(239,68,68,0.08)">
           <div className="w-10 h-10 rounded-xl bg-red-50 flex items-center justify-center flex-shrink-0">
             <TrendingDown className="w-5 h-5 text-red-500" />
           </div>
           <div>
             <p className="text-xs text-muted-foreground font-medium">Total do Mês</p>
-            <p className="text-xl font-bold text-red-500 tabular-nums">{formatCurrency(totalMonth)}</p>
+            <p className="text-xl font-bold text-red-500 tabular-nums">
+              <CurrencyCountUp value={totalMonth} />
+            </p>
           </div>
-        </div>
-        <div className="card-premium p-5 flex items-center gap-3 sm:col-span-1">
+        </SpotlightCard>
+        <SpotlightCard className="p-5 flex items-center gap-3 sm:col-span-1" spotlightColor="rgba(16,185,129,0.08)">
           <div className="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center flex-shrink-0">
             <CheckCircle2 className="w-5 h-5 text-emerald-600" />
           </div>
           <div>
             <p className="text-xs text-muted-foreground font-medium">Pagas</p>
-            <p className="text-xl font-bold text-emerald-600 tabular-nums">{formatCurrency(totalPaid)}</p>
+            <p className="text-xl font-bold text-emerald-600 tabular-nums">
+              <CurrencyCountUp value={totalPaid} />
+            </p>
           </div>
-        </div>
-        <div className="card-premium p-5 flex items-center gap-3 sm:col-span-1">
+        </SpotlightCard>
+        <SpotlightCard className="p-5 flex items-center gap-3 sm:col-span-1" spotlightColor="rgba(245,158,11,0.08)">
           <div className="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center flex-shrink-0">
             <Clock className="w-5 h-5 text-amber-600" />
           </div>
           <div>
             <p className="text-xs text-muted-foreground font-medium">Pendentes</p>
-            <p className="text-xl font-bold text-amber-600 tabular-nums">{formatCurrency(totalPending)}</p>
+            <p className="text-xl font-bold text-amber-600 tabular-nums">
+              <CurrencyCountUp value={totalPending} />
+            </p>
           </div>
-        </div>
-        <div className="card-premium p-5 sm:col-span-1">
+        </SpotlightCard>
+        <SpotlightCard className="p-5 sm:col-span-1">
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2.5">Top Categorias</p>
           <div className="space-y-1.5">
             {byCategory.length === 0 ? (
@@ -388,8 +398,9 @@ export default function Despesas() {
               ))
             )}
           </div>
-        </div>
+        </SpotlightCard>
       </div>
+      </AnimatedContent>
 
       {/* Filter tabs */}
       <div className="flex items-center gap-2">
@@ -409,6 +420,7 @@ export default function Despesas() {
       </div>
 
       {/* Table */}
+      <AnimatedContent delay={0.1}>
       <div className="card-premium overflow-hidden">
         {isLoading ? (
           <div className="flex items-center justify-center h-40 text-muted-foreground text-sm">Carregando...</div>
@@ -434,12 +446,16 @@ export default function Despesas() {
               </tr>
             </thead>
             <tbody className="divide-y divide-border">
-              {filteredExpenses.map((expense) => {
+              {filteredExpenses.map((expense, idx) => {
                 const cat = getCategoryInfo(expense.categoryId);
                 const pmLabel = PAYMENT_METHODS.find((m) => m.value === expense.paymentMethod);
                 const cardName = expense.paymentCardId ? cardMap.get(expense.paymentCardId) : null;
                 return (
-                  <tr key={expense.id} className={`hover:bg-muted/20 transition-colors group ${expense.isPaid ? "opacity-75" : ""}`}>
+                  <tr
+                    key={expense.id}
+                    className={`hover:bg-muted/20 transition-colors group ${expense.isPaid ? "opacity-75" : ""}`}
+                    style={{ animation: "row-in 0.3s ease forwards", animationDelay: `${idx * 0.04}s`, opacity: 0 }}
+                  >
                     {/* Status button */}
                     <td className="px-4 py-4">
                       <button
@@ -536,6 +552,7 @@ export default function Despesas() {
           </table>
         )}
       </div>
+      </AnimatedContent>
 
       {/* Create/Edit Dialog */}
       <Dialog open={open} onOpenChange={setOpen}>
